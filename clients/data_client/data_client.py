@@ -90,6 +90,16 @@ class DataClient:
         return linkedin_profile
 
     def store_processed_profile(self, pdf, markdown_text, email_to):
+        self.linkedin_profile = (
+            supabase_client.table("sdr_agent_linkedinprofile")
+            .select(
+                "*"
+            )
+            .eq("id", 169)
+            .single()
+            .execute()
+        ).data
+
         storage_path = f"{self.linkedin_profile.get('public_identifier')}_{self.linkedin_profile.get('id')}_profile.pdf"
 
         supabase_client.storage.from_("processedprofiles").upload(
