@@ -251,7 +251,7 @@ class AIClient:
                 "linkedin_profile": self.linkedin_profile,
                 "google_news": self.google_news
             }
-        )
+        ).content
 
     def check_news_available(self, news):
         return self._run_chain(
@@ -269,7 +269,7 @@ class AIClient:
                 "content": content,
                 "context": context
             }
-        )
+        ).content
 
     def create_citations(self, linkedin_url):
         citations = "## References\n"
@@ -333,202 +333,202 @@ class AIClient:
             f"🔗 [LinkedIn]({linkedin_url})  \n"
         )
 
-        with st.spinner("Generating opportunities..."):
-            opportunities = self.opportunities_chain()
-            opportunities_with_citations = self.add_citations_chain(
-                opportunities,
-                context={
-                    f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
-                    **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Opportunities generated...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Identifying talking points..."):
-            sleep(60)
-            talking_point = self.talking_point_chain()
-            sources = []
-
-            potential_sources = [
-                self.linkedin_profile,
-                self.posts,
-                self.comments,
-                self.google_news,
-                self.publications
-            ]
-
-            for source in potential_sources:
-                if source in self.citation_list:
-                    index = self.citation_list.index(source) + 1
-
-                    if source == self.posts:
-                        data = [post.get("text") for post in self.posts if post.get("text")]
-                    elif source == self.comments:
-                        data = [comment.get("comment_text") for comment in self.comments if comment.get("comment_text")]
-                    else:
-                        data = source
-
-                    if data and not (isinstance(data, (list, dict)) and not data):
-                        sources.append((data, index))
-
-            talking_point_with_citations = self.add_citations_chain(
-                talking_point,
-                context={
-                    f"[{index}]": data
-                    for data, index in sources
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Talking points identified...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Analyzing engagement highlights..."):
-            sleep(60)
-            engagement_highlights = self.engagement_highlights_chain()
-
-            context = {}
-
-            if self.posts in self.citation_list:
-                posts_content = [{"text": post.get("text"), "stats": post.get("stats")} for post in self.posts if post.get("text")]
-                if posts_content:
-                    index = self.citation_list.index(self.posts) + 1
-                    context[f"[{index}]"] = posts_content
-
-            engagement_highlights_with_citations = self.add_citations_chain(
-                engagement_highlights,
-                context=context
-            )
-        st.markdown('<span style="color:black;">✅ Engagement highlights analyzed...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Preparing objection handling strategies..."):
-            sleep(60)
-            objection_handling = self.objection_handling_chain()
-            objection_handling_with_citations = self.add_citations_chain(
-                objection_handling,
-                context={
-                    f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
-                    **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Objection handling strategies prepared...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Identifying trigger events and timing..."):
-            sleep(60)
-            trigger_events_and_timing = self.trigger_events_and_timing_chain()
-            context = {}
-
-            if self.posts in self.citation_list:
-                posts_content = [post.get("text") for post in self.posts if post.get("text")]
-                if posts_content:
-                    index = self.citation_list.index(self.posts) + 1
-                    context[f"[{index}]"] = posts_content
-
-            trigger_events_and_timing_with_citations = self.add_citations_chain(
-                trigger_events_and_timing,
-                context={
-                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
-                    **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites},
-                    **context
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Trigger events and timing identified ...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Determining engagement style..."):
-            sleep(60)
-            engagement_style = self.engagement_style_chain()
-
-            context = {}
-
-            if self.posts in self.citation_list:
-                posts_content = [post.get("text") for post in self.posts if post.get("text")]
-                if posts_content:
-                    index = self.citation_list.index(self.posts) + 1
-                    context[f"[{index}]"] = posts_content
-
-            if self.comments in self.citation_list:
-                comments_content = [comment.get("comment_text") for comment in self.comments if
-                                    comment.get("comment_text")]
-                if comments_content:
-                    index = self.citation_list.index(self.comments) + 1
-                    context[f"[{index}]"] = comments_content
-
-            engagement_style_with_citations = self.add_citations_chain(
-                engagement_style,
-                context=context
-            )
-        st.markdown('<span style="color:black;">✅ Engagement style determined...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Analyzing company information..."):
-            sleep(60)
-            about_company = self.about_company_chain()
-            about_company_with_citations = self.add_citations_chain(
-                about_company,
-                context={
-                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
-                    **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Company information Analyzed...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Analyzing LinkedIn data..."):
-            sleep(60)
-            linkedin_data = self.linkedin_data_chain()
-            linkedin_data_with_citations = self.add_citations_chain(
-                linkedin_data,
-                context={
-                    f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Linkedin information analyzed...</span>', unsafe_allow_html=True)
-
-        outreach_email_input = {
-            "opportunities": opportunities,
-            "talking_point": talking_point,
-            "engagement_highlights": engagement_highlights,
-            "objection_handling": objection_handling,
-            "trigger_events_and_timing": trigger_events_and_timing,
-            "engagement_style": engagement_style,
-            "about_company": about_company,
-            "linkedin_data": linkedin_data,
-            "sell_for_education": self.knowledge_base.get("sell_for_education"),
-            "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
-            "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
-            "pitches": self.knowledge_base.get("pitches"),
-            "access_ai": self.knowledge_base.get("ai_summary"),
-        }
-
-        with st.spinner("Crafting personalized outreach email..."):
-            outreach_email = self.outreach_email_chain(outreach_email_input)
-        st.markdown('<span style="color:black;">✅ Personalized outreach email crafted...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Adding additional outreaches..."):
-            sleep(60)
-            additional_suggested_outreach = self.suggested_additional_outreach()
-            additional_outreach_with_citations = self.add_citations_chain(
-                additional_suggested_outreach,
-                context={
-                    f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile
-                }
-            )
-        st.markdown('<span style="color:black;">✅ Additional outreaches added...</span>', unsafe_allow_html=True)
-
-        with st.spinner("Analyzing google publications..."):
-            sleep(60)
-            google_publications = self.publications_chain()
-
-            context = {}
-
-            if self.publications in self.citation_list and self.publications:
-                if not (isinstance(self.publications, (list, dict)) and not self.publications):
-                    index = self.citation_list.index(self.publications) + 1
-                    context[f"[{index}]"] = self.publications
-
-            google_publications_with_citations = self.add_citations_chain(
-                google_publications,
-                context=context
-            )
-        st.markdown('<span style="color:black;">✅ Google Publications Analyzed...</span>', unsafe_allow_html=True)
+        # with st.spinner("Generating opportunities..."):
+        #     opportunities = self.opportunities_chain()
+        #     opportunities_with_citations = self.add_citations_chain(
+        #         opportunities,
+        #         context={
+        #             f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
+        #             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
+        #             **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Opportunities generated...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Identifying talking points..."):
+        #     sleep(60)
+        #     talking_point = self.talking_point_chain()
+        #     sources = []
+        #
+        #     potential_sources = [
+        #         self.linkedin_profile,
+        #         self.posts,
+        #         self.comments,
+        #         self.google_news,
+        #         self.publications
+        #     ]
+        #
+        #     for source in potential_sources:
+        #         if source in self.citation_list:
+        #             index = self.citation_list.index(source) + 1
+        #
+        #             if source == self.posts:
+        #                 data = [post.get("text") for post in self.posts if post.get("text")]
+        #             elif source == self.comments:
+        #                 data = [comment.get("comment_text") for comment in self.comments if comment.get("comment_text")]
+        #             else:
+        #                 data = source
+        #
+        #             if data and not (isinstance(data, (list, dict)) and not data):
+        #                 sources.append((data, index))
+        #
+        #     talking_point_with_citations = self.add_citations_chain(
+        #         talking_point,
+        #         context={
+        #             f"[{index}]": data
+        #             for data, index in sources
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Talking points identified...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Analyzing engagement highlights..."):
+        #     sleep(60)
+        #     engagement_highlights = self.engagement_highlights_chain()
+        #
+        #     context = {}
+        #
+        #     if self.posts in self.citation_list:
+        #         posts_content = [{"text": post.get("text"), "stats": post.get("stats")} for post in self.posts if post.get("text")]
+        #         if posts_content:
+        #             index = self.citation_list.index(self.posts) + 1
+        #             context[f"[{index}]"] = posts_content
+        #
+        #     engagement_highlights_with_citations = self.add_citations_chain(
+        #         engagement_highlights,
+        #         context=context
+        #     )
+        # st.markdown('<span style="color:black;">✅ Engagement highlights analyzed...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Preparing objection handling strategies..."):
+        #     sleep(60)
+        #     objection_handling = self.objection_handling_chain()
+        #     objection_handling_with_citations = self.add_citations_chain(
+        #         objection_handling,
+        #         context={
+        #             f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
+        #             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
+        #             **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Objection handling strategies prepared...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Identifying trigger events and timing..."):
+        #     sleep(60)
+        #     trigger_events_and_timing = self.trigger_events_and_timing_chain()
+        #     context = {}
+        #
+        #     if self.posts in self.citation_list:
+        #         posts_content = [post.get("text") for post in self.posts if post.get("text")]
+        #         if posts_content:
+        #             index = self.citation_list.index(self.posts) + 1
+        #             context[f"[{index}]"] = posts_content
+        #
+        #     trigger_events_and_timing_with_citations = self.add_citations_chain(
+        #         trigger_events_and_timing,
+        #         context={
+        #             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
+        #             **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites},
+        #             **context
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Trigger events and timing identified ...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Determining engagement style..."):
+        #     sleep(60)
+        #     engagement_style = self.engagement_style_chain()
+        #
+        #     context = {}
+        #
+        #     if self.posts in self.citation_list:
+        #         posts_content = [post.get("text") for post in self.posts if post.get("text")]
+        #         if posts_content:
+        #             index = self.citation_list.index(self.posts) + 1
+        #             context[f"[{index}]"] = posts_content
+        #
+        #     if self.comments in self.citation_list:
+        #         comments_content = [comment.get("comment_text") for comment in self.comments if
+        #                             comment.get("comment_text")]
+        #         if comments_content:
+        #             index = self.citation_list.index(self.comments) + 1
+        #             context[f"[{index}]"] = comments_content
+        #
+        #     engagement_style_with_citations = self.add_citations_chain(
+        #         engagement_style,
+        #         context=context
+        #     )
+        # st.markdown('<span style="color:black;">✅ Engagement style determined...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Analyzing company information..."):
+        #     sleep(60)
+        #     about_company = self.about_company_chain()
+        #     about_company_with_citations = self.add_citations_chain(
+        #         about_company,
+        #         context={
+        #             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
+        #             **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Company information Analyzed...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Analyzing LinkedIn data..."):
+        #     sleep(60)
+        #     linkedin_data = self.linkedin_data_chain()
+        #     linkedin_data_with_citations = self.add_citations_chain(
+        #         linkedin_data,
+        #         context={
+        #             f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
+        #             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Linkedin information analyzed...</span>', unsafe_allow_html=True)
+        #
+        # outreach_email_input = {
+        #     "opportunities": opportunities,
+        #     "talking_point": talking_point,
+        #     "engagement_highlights": engagement_highlights,
+        #     "objection_handling": objection_handling,
+        #     "trigger_events_and_timing": trigger_events_and_timing,
+        #     "engagement_style": engagement_style,
+        #     "about_company": about_company,
+        #     "linkedin_data": linkedin_data,
+        #     "sell_for_education": self.knowledge_base.get("sell_for_education"),
+        #     "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
+        #     "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
+        #     "pitches": self.knowledge_base.get("pitches"),
+        #     "access_ai": self.knowledge_base.get("ai_summary"),
+        # }
+        #
+        # with st.spinner("Crafting personalized outreach email..."):
+        #     outreach_email = self.outreach_email_chain(outreach_email_input)
+        # st.markdown('<span style="color:black;">✅ Personalized outreach email crafted...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Adding additional outreaches..."):
+        #     sleep(60)
+        #     additional_suggested_outreach = self.suggested_additional_outreach()
+        #     additional_outreach_with_citations = self.add_citations_chain(
+        #         additional_suggested_outreach,
+        #         context={
+        #             f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile
+        #         }
+        #     )
+        # st.markdown('<span style="color:black;">✅ Additional outreaches added...</span>', unsafe_allow_html=True)
+        #
+        # with st.spinner("Analyzing google publications..."):
+        #     sleep(60)
+        #     google_publications = self.publications_chain()
+        #
+        #     context = {}
+        #
+        #     if self.publications in self.citation_list and self.publications:
+        #         if not (isinstance(self.publications, (list, dict)) and not self.publications):
+        #             index = self.citation_list.index(self.publications) + 1
+        #             context[f"[{index}]"] = self.publications
+        #
+        #     google_publications_with_citations = self.add_citations_chain(
+        #         google_publications,
+        #         context=context
+        #     )
+        # st.markdown('<span style="color:black;">✅ Google Publications Analyzed...</span>', unsafe_allow_html=True)
 
         with st.spinner("Analyzing google news..."):
             sleep(60)
@@ -552,16 +552,18 @@ class AIClient:
                 )
         st.markdown('<span style="color:black;">✅ Google News Analyzed...</span>', unsafe_allow_html=True)
 
-        sales_insights_markdown_with_citations = f"""## Sales Insights
-{talking_point_with_citations}
-{opportunities_with_citations}
-{engagement_style_with_citations}
-"""
+#         sales_insights_markdown_with_citations = f"""## Sales Insights
+# {talking_point_with_citations}
+# {opportunities_with_citations}
+# {engagement_style_with_citations}
+# """
+#
+#         citations = self.create_citations(linkedin_url)
+#         return (
+#             f"{profile_info_markdown}\n\n{sales_insights_markdown_with_citations}\n\n{objection_handling_with_citations}\n\n"
+#             f"{trigger_events_and_timing_with_citations}\n\n{engagement_highlights_with_citations}\n\n{about_company_with_citations}\n\n"
+#             f"{linkedin_data_with_citations}\n\n{google_publications_with_citations}\n\n{google_news_with_citations}\n\n"
+#             f"{outreach_email}\n\n{additional_outreach_with_citations}\n\n{citations}"
+#         )
 
-        citations = self.create_citations(linkedin_url)
-        return (
-            f"{profile_info_markdown}\n\n{sales_insights_markdown_with_citations}\n\n{objection_handling_with_citations}\n\n"
-            f"{trigger_events_and_timing_with_citations}\n\n{engagement_highlights_with_citations}\n\n{about_company_with_citations}\n\n"
-            f"{linkedin_data_with_citations}\n\n{google_publications_with_citations}\n\n{google_news_with_citations}\n\n"
-            f"{outreach_email}\n\n{additional_outreach_with_citations}\n\n{citations}"
-        )
+        return (f"{profile_info_markdown}\n\n{google_news_with_citations}\n")
