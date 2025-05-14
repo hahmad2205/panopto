@@ -1,6 +1,5 @@
 import base64
 
-import streamlit as st
 from decouple import config
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
@@ -29,42 +28,39 @@ class EmailClient:
                         <p>
                           The AI-generated profile report for the prospect <strong>{linkedin_profile.get('full_name')}</strong> is now ready.
                         </p>
-                    
+
                         <p>You'll find the detailed report attached, including:</p>
-                    
+
                         <ul>
                           <li>Prospect's role, focus areas, and recent initiatives</li>
                           <li>Company overview, growth indicators, and key updates</li>
                           <li>Opportunities and potential conversation starters</li>
                         </ul>
-                    
+
                         <p>
                           You can use this report to personalize your outreach and identify potential value areas where <strong>Panopto</strong> can assist.
                         </p>
                         <p>You can access and download the detailed report via the link below:</p>
                         <a href="{final_pdf}">Download Report</a>
-                    
+
                         <p>Best regards,<br />
                         <strong>Panopto SDR AI</strong></p>
                     </body>
                 </html>
                 """
 
-        with st.spinner("Sending email..."):
-            # Send email with attachment
-            self.send_email_with_attachment(
-                email_to=email_to,
-                email_subject="Panopto SDR AI Prospect Profile ready for review",
-                email_body=email_template,
-                attachments=[
-                    {
-                        "filename": storage_path,
-                        "content": pdf,
-                        "mimetype": "application/pdf",
-                    }
-                ],
-            )
-        st.markdown('<span style="color:black;">✅ Email Sent...</span>', unsafe_allow_html=True)
+        self.send_email_with_attachment(
+            email_to=email_to,
+            email_subject="Panopto SDR AI Prospect Profile ready for review",
+            email_body=email_template,
+            attachments=[
+                {
+                    "filename": storage_path,
+                    "content": pdf,
+                    "mimetype": "application/pdf",
+                }
+            ],
+        )
 
     def send_email_with_attachment(self, email_to, email_subject, email_body, attachments=None):
         """Send email with attachments using SendGrid API"""
