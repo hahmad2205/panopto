@@ -1,0 +1,5 @@
+wkhtmltopdf
+xfonts-75dpi
+xfonts-base
+build-essential
+libpq-dev
