@@ -150,7 +150,7 @@ class AIClient:
         return self._run_chain(
             "engagement_style_chain_prompt",
             {
-                "linkedin_posts_caption": [post.get("text") for post in self.posts],
+                "linkedin_posts_caption": [post.get("text") for post in self.posts if not post.get("post_type") == "repost"],
                 "linkedin_comments": [c.get("comment_text") for c in self.comments],
             },
         ).content
