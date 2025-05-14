@@ -589,7 +589,7 @@ class AIClient:
                             **context
                         }
                     )
-                    result += f"{google_news_with_citations}\n\n"
+                result += f"{google_news_with_citations}\n\n"
 
             st.markdown('<span style="color:black;">✅ Google News Analyzed...</span>', unsafe_allow_html=True)
         except Exception as e:
