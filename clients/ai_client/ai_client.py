@@ -251,7 +251,7 @@ class AIClient:
                 "linkedin_profile": self.linkedin_profile,
                 "google_news": self.google_news
             }
-        ).content
+        )
 
     def check_news_available(self, news):
         return self._run_chain(
@@ -269,7 +269,7 @@ class AIClient:
                 "content": content,
                 "context": context
             }
-        ).content
+        )
 
     def create_citations(self, linkedin_url):
         citations = "## References\n"
@@ -531,7 +531,6 @@ class AIClient:
         # st.markdown('<span style="color:black;">✅ Google Publications Analyzed...</span>', unsafe_allow_html=True)
 
         with st.spinner("Analyzing google news..."):
-            sleep(60)
             google_news = self.news_chain()
             self.news_availabilty = self.check_news_available(google_news)
             google_news_with_citations = google_news
