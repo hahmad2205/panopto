@@ -24,7 +24,7 @@ def process_user_details(linkedin_url, email_to):
                     pdf = markdown_to_pdf(markdown_text)
                     final_pdf, storage_path = data_client.store_processed_profile(pdf, markdown_text, email_to)
 
-                    st.markdown('<span style="color:black;">❌ PDF created...</span>',
+                    st.markdown('<span style="color:black;">✅ PDF created...</span>',
                                 unsafe_allow_html=True)
             except Exception as e:
                 st.markdown('<span style="color:black;">❌ PDF creation failed...</span>',
