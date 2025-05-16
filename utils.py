@@ -194,6 +194,14 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
                 margin-top: 1.2em;
                 margin-bottom: 0.6em;
             }}
+            h2 {{
+                font-size: 18px;
+                font-weight: 400;
+                line-height: 1;
+                color: #28B566;
+                margin-top: 1em;
+                margin-bottom: 0.3em;
+            }}
             .svg-icon {{
                 display: block;
                 width: 300px;
