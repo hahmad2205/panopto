@@ -183,7 +183,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
                 font-weight: 600;
                 line-height: 1.3;
                 color: #0F783D;
-                margin-top: 1.2em;
+                margin-top: 0.2em;
                 margin-bottom: 0.6em;
             }}
             h2 {{
@@ -194,7 +194,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
                 margin-top: 1.2em;
                 margin-bottom: 0.6em;
             }}
-            h2 {{
+            h3 {{
                 font-size: 18px;
                 font-weight: 400;
                 line-height: 1;
