@@ -164,7 +164,7 @@ def markdown_to_pdf(markdown_content):
                 }}
             }}
             body {{
-                font-family: "Arial", serif;
+                font-family: "Inter", sans-serif;
             }}
             h2 {{
                 font-size: 24px;
