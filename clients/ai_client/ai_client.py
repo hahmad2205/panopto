@@ -451,200 +451,200 @@ class AIClient:
             st.markdown('<span style="color:black;">❌ Objection handling strategies preparation failed...</span>',
                         unsafe_allow_html=True)
 
-        # try:
-        #     with st.spinner("Identifying trigger events and timing..."):
-        #         trigger_events_and_timing = self.trigger_events_and_timing_chain()
-        #         context = {}
-        #
-        #         if self.posts in self.citation_list:
-        #             posts_content = [post.get("text") for post in self.posts if post.get("text")]
-        #             if posts_content:
-        #                 index = self.citation_list.index(self.posts) + 1
-        #                 context[f"[{index}]"] = posts_content
-        #
-        #         trigger_events_and_timing_with_citations = self.add_citations_chain(
-        #             trigger_events_and_timing,
-        #             context={
-        #                 **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
-        #                 **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites},
-        #                 **context
-        #             }
-        #         )
-        #         result += f"{trigger_events_and_timing_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Trigger events and timing identified ...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Trigger events and timing identification failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Analyzing engagement highlights..."):
-        #         engagement_highlights = self.engagement_highlights_chain()
-        #
-        #         context = {}
-        #
-        #         if self.posts in self.citation_list:
-        #             posts_content = [{"text": post.get("text"), "stats": post.get("stats")} for post in self.posts if post.get("text")]
-        #             if posts_content:
-        #                 index = self.citation_list.index(self.posts) + 1
-        #                 context[f"[{index}]"] = posts_content
-        #
-        #         engagement_highlights_with_citations = self.add_citations_chain(
-        #             engagement_highlights,
-        #             context=context
-        #         )
-        #         result += f"{engagement_highlights_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Engagement highlights analyzed...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Processing Engagement highlights failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Analyzing company information..."):
-        #         about_company = self.about_company_chain()
-        #         about_company_with_citations = self.add_citations_chain(
-        #             about_company,
-        #             context={
-        #                 **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
-        #                 **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
-        #             }
-        #         )
-        #         result += f"{about_company_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Company information Analyzed...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Analyzing company information failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Analyzing LinkedIn data..."):
-        #         linkedin_data = self.linkedin_data_chain()
-        #         linkedin_data_with_citations = self.add_citations_chain(
-        #             linkedin_data,
-        #             context={
-        #                 f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-        #                 **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
-        #             }
-        #         )
-        #         result += f"{linkedin_data_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Linkedin information analyzed...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Analyzing LinkedIn data failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Analyzing google publications..."):
-        #         google_publications = self.publications_chain()
-        #
-        #         context = {}
-        #
-        #         if self.publications in self.citation_list and self.publications:
-        #             if not (isinstance(self.publications, (list, dict)) and not self.publications):
-        #                 index = self.citation_list.index(self.publications) + 1
-        #                 context[f"[{index}]"] = self.publications
-        #
-        #         google_publications_with_citations = self.add_citations_chain(
-        #             google_publications,
-        #             context=context
-        #         )
-        #         result += f"{google_publications_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Google Publications Analyzed...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Analyzing google publications failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Analyzing google news..."):
-        #         google_news_content = self.news_content_chain()
-        #         google_news_with_article_content = []
-        #
-        #         top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
-        #
-        #         for news in top_news:
-        #             article_crawler = WebsiteCrawlActor({"website_url": news.link})
-        #             google_news_with_article_content.append({
-        #                 "title": news.title,
-        #                 "content": article_crawler.crawl_page()
-        #             })
-        #
-        #         google_news = self.news_chain(google_news_with_article_content)
-        #
-        #         self.news_availability = self.check_news_available(google_news)
-        #         google_news_with_citations = google_news
-        #
-        #         if self.news_availability.news_available:
-        #             context = {}
-        #             if self.google_news in self.citation_list and self.google_news:
-        #                 if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
-        #                     index = self.citation_list.index(self.google_news) + 1
-        #                     context[f"[{index}]"] = self.google_news
-        #
-        #             google_news_with_citations = self.add_citations_chain(
-        #                 google_news,
-        #                 context={
-        #                     f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-        #                     **context
-        #                 }
-        #             )
-        #         result += f"{google_news_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Google News Analyzed...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Analyzing google news failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Crafting personalized outreach email..."):
-        #         outreach_email_input = {
-        #             "opportunities": opportunities,
-        #             "talking_point": talking_point,
-        #             "engagement_highlights": engagement_highlights,
-        #             "objection_handling": objection_handling,
-        #             "trigger_events_and_timing": trigger_events_and_timing,
-        #             "engagement_style": engagement_style,
-        #             "about_company": about_company,
-        #             "linkedin_data": linkedin_data,
-        #             "sell_for_education": self.knowledge_base.get("sell_for_education"),
-        #             "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
-        #             "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
-        #             "pitches": self.knowledge_base.get("pitches"),
-        #             "access_ai": self.knowledge_base.get("ai_summary"),
-        #         }
-        #         outreach_email = self.outreach_email_chain(outreach_email_input)
-        #         result += f"{outreach_email}\n\n"
-        #     st.markdown('<span style="color:black;">✅ Personalized outreach email crafted...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Crafting personalized outreach email failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Adding additional outreaches..."):
-        #         additional_suggested_outreach = self.suggested_additional_outreach()
-        #         additional_outreach_with_citations = self.add_citations_chain(
-        #             additional_suggested_outreach,
-        #             context={
-        #                 f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile
-        #             }
-        #         )
-        #     result += f"{additional_outreach_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Additional outreaches added...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Adding additional outreaches failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-        # try:
-        #     with st.spinner("Adding citations..."):
-        #         citations = self.create_citations(linkedin_url)
-        #         result += f"{citations}"
-        #
-        #         st.markdown('<span style="color:black;">✅ Citations added...</span>',
-        #                     unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
-        #                 unsafe_allow_html=True)
+        try:
+            with st.spinner("Identifying trigger events and timing..."):
+                trigger_events_and_timing = self.trigger_events_and_timing_chain()
+                context = {}
+
+                if self.posts in self.citation_list:
+                    posts_content = [post.get("text") for post in self.posts if post.get("text")]
+                    if posts_content:
+                        index = self.citation_list.index(self.posts) + 1
+                        context[f"[{index}]"] = posts_content
+
+                trigger_events_and_timing_with_citations = self.add_citations_chain(
+                    trigger_events_and_timing,
+                    context={
+                        **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
+                        **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites},
+                        **context
+                    }
+                )
+                result += f"{trigger_events_and_timing_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Trigger events and timing identified ...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Trigger events and timing identification failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Analyzing engagement highlights..."):
+                engagement_highlights = self.engagement_highlights_chain()
+
+                context = {}
+
+                if self.posts in self.citation_list:
+                    posts_content = [{"text": post.get("text"), "stats": post.get("stats")} for post in self.posts if post.get("text")]
+                    if posts_content:
+                        index = self.citation_list.index(self.posts) + 1
+                        context[f"[{index}]"] = posts_content
+
+                engagement_highlights_with_citations = self.add_citations_chain(
+                    engagement_highlights,
+                    context=context
+                )
+                result += f"{engagement_highlights_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Engagement highlights analyzed...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Processing Engagement highlights failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Analyzing company information..."):
+                about_company = self.about_company_chain()
+                about_company_with_citations = self.add_citations_chain(
+                    about_company,
+                    context={
+                        **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
+                        **{f"[{self.citation_list.index(company_website) + 1}]": company_website for company_website in self.companies_websites}
+                    }
+                )
+                result += f"{about_company_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Company information Analyzed...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Analyzing company information failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Analyzing LinkedIn data..."):
+                linkedin_data = self.linkedin_data_chain()
+                linkedin_data_with_citations = self.add_citations_chain(
+                    linkedin_data,
+                    context={
+                        f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
+                        **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
+                    }
+                )
+                result += f"{linkedin_data_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Linkedin information analyzed...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Analyzing LinkedIn data failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Analyzing google publications..."):
+                google_publications = self.publications_chain()
+
+                context = {}
+
+                if self.publications in self.citation_list and self.publications:
+                    if not (isinstance(self.publications, (list, dict)) and not self.publications):
+                        index = self.citation_list.index(self.publications) + 1
+                        context[f"[{index}]"] = self.publications
+
+                google_publications_with_citations = self.add_citations_chain(
+                    google_publications,
+                    context=context
+                )
+                result += f"{google_publications_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Google Publications Analyzed...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Analyzing google publications failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Analyzing google news..."):
+                google_news_content = self.news_content_chain()
+                google_news_with_article_content = []
+
+                top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
+
+                for news in top_news:
+                    article_crawler = WebsiteCrawlActor({"website_url": news.link})
+                    google_news_with_article_content.append({
+                        "title": news.title,
+                        "content": article_crawler.crawl_page()
+                    })
+
+                google_news = self.news_chain(google_news_with_article_content)
+
+                self.news_availability = self.check_news_available(google_news)
+                google_news_with_citations = google_news
+
+                if self.news_availability.news_available:
+                    context = {}
+                    if self.google_news in self.citation_list and self.google_news:
+                        if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
+                            index = self.citation_list.index(self.google_news) + 1
+                            context[f"[{index}]"] = self.google_news
+
+                    google_news_with_citations = self.add_citations_chain(
+                        google_news,
+                        context={
+                            f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
+                            **context
+                        }
+                    )
+                result += f"{google_news_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Google News Analyzed...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Analyzing google news failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Crafting personalized outreach email..."):
+                outreach_email_input = {
+                    "opportunities": opportunities,
+                    "talking_point": talking_point,
+                    "engagement_highlights": engagement_highlights,
+                    "objection_handling": objection_handling,
+                    "trigger_events_and_timing": trigger_events_and_timing,
+                    "engagement_style": engagement_style,
+                    "about_company": about_company,
+                    "linkedin_data": linkedin_data,
+                    "sell_for_education": self.knowledge_base.get("sell_for_education"),
+                    "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
+                    "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
+                    "pitches": self.knowledge_base.get("pitches"),
+                    "access_ai": self.knowledge_base.get("ai_summary"),
+                }
+                outreach_email = self.outreach_email_chain(outreach_email_input)
+                result += f"{outreach_email}\n\n"
+            st.markdown('<span style="color:black;">✅ Personalized outreach email crafted...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Crafting personalized outreach email failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Adding additional outreaches..."):
+                additional_suggested_outreach = self.suggested_additional_outreach()
+                additional_outreach_with_citations = self.add_citations_chain(
+                    additional_suggested_outreach,
+                    context={
+                        f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile
+                    }
+                )
+            result += f"{additional_outreach_with_citations}\n\n"
+
+            st.markdown('<span style="color:black;">✅ Additional outreaches added...</span>', unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Adding additional outreaches failed...</span>',
+                        unsafe_allow_html=True)
+
+        try:
+            with st.spinner("Adding citations..."):
+                citations = self.create_citations(linkedin_url)
+                result += f"{citations}"
+
+                st.markdown('<span style="color:black;">✅ Citations added...</span>',
+                            unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
+                        unsafe_allow_html=True)
 
         return profile_info_markdown, result
