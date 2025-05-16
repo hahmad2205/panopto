@@ -167,25 +167,13 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
                     content: element(footer);
                 }}
             }}
-            html, body {{
-                margin: 0;
-                padding: 0;
-                font-family: "Roboto", sans-serif;
+            body {{
+                font-family: "Open Sans", sans-serif;
                 color: #666666;
-            }}
-            
-            .main-content {{
-                margin: 0;
-                padding: 0;
-                position: absolute;
-                top: 0;
-                left: 0;
             }}
             .profile-info {{
                 color: #CCCCCC;  
                 background-color: #1A1A1A;
-                padding: 20px;
-                width: fit-content;
             }}
             .profile-info a {{
                 color: #CCCCCC;
