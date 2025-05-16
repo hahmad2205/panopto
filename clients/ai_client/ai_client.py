@@ -334,7 +334,7 @@ class AIClient:
         processing_spinner_style()
         result = ""
         current_experience_lines = "\n".join(
-            f"**{current_experience.get('title').title() if current_experience.get('title') else None} | {current_experience.get('company').strip() if current_experience.get('company').strip() else None}**  "
+            f"{current_experience.get('title').title() if current_experience.get('title') else None} | {current_experience.get('company').strip() if current_experience.get('company').strip() else None}  "
             for current_experience in self.linkedin_profile.get("experiences")
             if not current_experience.get("ends_at")
         )
