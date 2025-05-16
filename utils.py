@@ -211,6 +211,7 @@ def markdown_to_pdf(markdown_content):
         </body>
         </html>
         """
+    print(full_html)
 
     pdf_options = {
         "page-size": "A4",
