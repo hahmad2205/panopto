@@ -162,7 +162,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
         <style>
             @page {{
-                margin: 50px 0px;
+                margin: 0px;
                 @bottom-center {{
                     content: element(footer);
                 }}
