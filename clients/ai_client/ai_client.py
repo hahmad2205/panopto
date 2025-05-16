@@ -345,7 +345,7 @@ class AIClient:
             f"{self.linkedin_profile.get('city')}, {self.linkedin_profile.get('state')}, {self.linkedin_profile.get('country')}  \n"
             f"🔗 [LinkedIn]({linkedin_url})  \n"
         )
-        result += f"{profile_info_markdown}\n\n## Sales Insights\n"
+        # result += f"{profile_info_markdown}\n\n## Sales Insights\n"
 
         try:
             with st.spinner("Generating opportunities..."):
@@ -647,4 +647,4 @@ class AIClient:
         #     st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
         #                 unsafe_allow_html=True)
 
-        return result
+        return profile_info_markdown, result

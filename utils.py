@@ -133,7 +133,7 @@ def parse_datetime(date_str):
         return None
 
 
-def markdown_to_pdf(markdown_content):
+def markdown_to_pdf(profile_with_markdown, markdown_content):
     html_content = markdown2.markdown(markdown_content, extras=["fenced-code-blocks", "tables", "footnotes"])
 
     with open("logo.svg", "rb") as image_file:
@@ -145,6 +145,9 @@ def markdown_to_pdf(markdown_content):
     # Create the main HTML content first
     main_html = f"""
         <div class="main-content">
+            <div class="profile-info">
+                {profile_with_markdown}
+            </div>
             {svg_img_html}
             {html_content}
         </div>
@@ -167,7 +170,11 @@ def markdown_to_pdf(markdown_content):
                 font-family: "Open Sans", sans-serif;
                 color: #666666;
             }}
-            h1 {{
+            .profile-info {{
+                color: #CCCCCC;
+                
+            }}
+            .profile-info h1 {{
                 font-size: 24px;
                 font-weight: 600;
                 line-height: 1.3;
