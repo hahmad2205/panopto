@@ -168,7 +168,7 @@ def markdown_to_pdf(markdown_content):
             }}
             h2 {{
                 font-size: 24px;
-                font-weight: 600;
+                font-weight: 500;
                 line-height: 1.3;
                 color: #202124;
                 margin-top: 1.2em;
