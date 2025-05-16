@@ -13,7 +13,16 @@ logger = logging.getLogger(__name__)
 def process_user_details(linkedin_url, email_to):
     try:
         data_client = DataClient()
-        linkedin_profile = data_client.fetch_user_data(linkedin_url)
+        # linkedin_profile = data_client.fetch_user_data(linkedin_url)
+        linkedin_profile = profile_resp = (
+            supabase_client.table("sdr_agent_linkedinprofile")
+            .select(
+                "*"
+            )
+            .eq("id", 230)
+            .single()
+            .execute()
+        ).data
 
         if linkedin_profile:
             ai_client = AIClient(linkedin_profile.get("id"))

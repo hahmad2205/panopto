@@ -164,7 +164,7 @@ def markdown_to_pdf(markdown_content):
                 }}
             }}
             body {{
-                font-family: inter, sans-serif;
+                font-family: "Roboto Slab", serif;
             }}
             h2 {{
                 font-size: 24px;
