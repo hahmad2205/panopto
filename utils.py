@@ -165,12 +165,13 @@ def markdown_to_pdf(markdown_content):
             }}
             body {{
                 font-family: "Open Sans", sans-serif;
+                color: #666666;
             }}
             h1 {{
                 font-size: 24px;
                 font-weight: 600;
                 line-height: 1.3;
-                color: #202124;
+                color: #0F783D;
                 margin-top: 1.2em;
                 margin-bottom: 0.6em;
             }}
@@ -178,7 +179,7 @@ def markdown_to_pdf(markdown_content):
                 font-size: 24px;
                 font-weight: 500;
                 line-height: 1.3;
-                color: #202124;
+                color: #28B566;
                 margin-top: 1.2em;
                 margin-bottom: 0.6em;
             }}
