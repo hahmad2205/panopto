@@ -5,6 +5,7 @@ import streamlit as st
 from clients.ai_client.ai_client import AIClient
 from clients.data_client.data_client import DataClient
 from clients.email_client.email_client import EmailClient
+from supabase_client import supabase_client
 from utils import markdown_to_pdf
 
 logger = logging.getLogger(__name__)
