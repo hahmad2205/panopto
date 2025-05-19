@@ -130,7 +130,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
         "page-size": "A4",
         "encoding": "UTF-8",
         "enable-local-file-access": "",
-        "margin-top": "2mm",
+        "margin-top": "5mm",
         "margin-right": "0mm",
         "margin-left": "0mm",
         "margin-bottom": "20mm",
