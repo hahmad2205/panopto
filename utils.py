@@ -37,7 +37,9 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
             <div class="profile-info">
                 {profile_content}
             </div>
+            <div class="main-content">
             {html_content}
+            </div>
         </div>
     """
 
@@ -63,6 +65,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
             .profile-info {{
                 color: #CCCCCC;  
                 background-color: #1A1A1A;
+                padding: 40px 20px;
             }}
             .profile-info a {{
                 color: #CCCCCC;
@@ -71,15 +74,18 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
                 font-size: 24px;
                 font-weight: 600;
                 line-height: 1.3;
-                color: #0F783D;
+                color: #28B566;
                 margin-top: 0.2em;
                 margin-bottom: 0.6em;
+            }}
+            .main-content {{
+                padding: 0 40px 40px 40px;
             }}
             h2 {{
                 font-size: 24px;
                 font-weight: 500;
                 line-height: 1.3;
-                color: #28B566;
+                color: #0F783D;
                 margin-top: 1.2em;
                 margin-bottom: 0.6em;
             }}
@@ -123,7 +129,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
         "page-size": "A4",
         "encoding": "UTF-8",
         "enable-local-file-access": "",
-        "margin-top": "0mm",
+        "margin-top": "5mm",
         "margin-right": "0mm",
         "margin-left": "0mm",
         "margin-bottom": "20mm",
