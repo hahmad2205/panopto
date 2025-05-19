@@ -32,7 +32,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
 
     # Create the main HTML content first
     main_html = f"""
-        <div class="main-content">
+        <div>
             {svg_img_html}
             <div class="profile-info">
                 {profile_content}
@@ -65,7 +65,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
             .profile-info {{
                 color: #CCCCCC;  
                 background-color: #1A1A1A;
-                padding: 40px 20px;
+                padding: 20px 40px;
             }}
             .profile-info a {{
                 color: #CCCCCC;

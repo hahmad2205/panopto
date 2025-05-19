@@ -422,41 +422,41 @@ class AIClient:
         result = ""
 
         profile_info_markdown = self.process_profile_info(linkedin_url)
-        # result += f"{profile_info_markdown}\n\n## Sales Insights\n"
+        result += f"{profile_info_markdown}\n\n## Sales Insights\n"
         #
-        # steps = [
-        #     ("Generating opportunities", self.opportunities_chain, lambda: {
-        #         **self.get_profile_context(),
-        #         **self.get_company_context()
-        #     }),
-        #     ("Identifying talking points", self.talking_point_chain, lambda: self.get_context_from_sources([
-        #         self.linkedin_profile, self.posts, self.comments, self.google_news, self.publications
-        #     ])),
-        #     ("Determining engagement style", self.engagement_style_chain, lambda: self.get_context_from_sources([
-        #         self.posts, self.comments
-        #     ])),
-        #     ("Preparing objection handling strategies", self.objection_handling_chain, lambda: {
-        #         **self.get_profile_context(),
-        #         **self.get_company_context()
-        #     }),
-        #     ("Identifying trigger events and timing", self.trigger_events_and_timing_chain, lambda: {
-        #         **self.get_company_context(),
-        #         **self.get_context_from_sources([self.posts])
-        #     }),
-        #     ("Analyzing engagement highlights", self.engagement_highlights_chain,
-        #      lambda: self.get_context_from_sources([self.posts])),
-        #     ("Analyzing company information", self.about_company_chain, self.get_company_context),
-        #     ("Analyzing LinkedIn data", self.linkedin_data_chain, lambda: {
-        #         **self.get_profile_context(),
-        #         **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
-        #     }),
-        #     ("Analyzing google publications", self.publications_chain,
-        #      lambda: self.get_context_from_sources([self.publications])),
-        #     ("Analyzing google news", self.process_news_content, self.get_google_news_context),
-        # ]
-        #
-        # for label, chain_func, context_func in steps:
-        #     result += self.process_with_spinner(label, chain_func, context_func) + "\n\n"
+        steps = [
+            ("Generating opportunities", self.opportunities_chain, lambda: {
+                **self.get_profile_context(),
+                **self.get_company_context()
+            }),
+            ("Identifying talking points", self.talking_point_chain, lambda: self.get_context_from_sources([
+                self.linkedin_profile, self.posts, self.comments, self.google_news, self.publications
+            ])),
+            ("Determining engagement style", self.engagement_style_chain, lambda: self.get_context_from_sources([
+                self.posts, self.comments
+            ])),
+            # ("Preparing objection handling strategies", self.objection_handling_chain, lambda: {
+            #     **self.get_profile_context(),
+            #     **self.get_company_context()
+            # }),
+            # ("Identifying trigger events and timing", self.trigger_events_and_timing_chain, lambda: {
+            #     **self.get_company_context(),
+            #     **self.get_context_from_sources([self.posts])
+            # }),
+            # ("Analyzing engagement highlights", self.engagement_highlights_chain,
+            #  lambda: self.get_context_from_sources([self.posts])),
+            # ("Analyzing company information", self.about_company_chain, self.get_company_context),
+            # ("Analyzing LinkedIn data", self.linkedin_data_chain, lambda: {
+            #     **self.get_profile_context(),
+            #     **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
+            # }),
+            # ("Analyzing google publications", self.publications_chain,
+            #  lambda: self.get_context_from_sources([self.publications])),
+            # ("Analyzing google news", self.process_news_content, self.get_google_news_context),
+        ]
+
+        for label, chain_func, context_func in steps:
+            result += self.process_with_spinner(label, chain_func, context_func) + "\n\n"
         #
         # outreach_email_input = {
         #     "opportunities": self.opportunities_chain(),
