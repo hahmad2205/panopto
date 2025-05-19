@@ -286,10 +286,6 @@ class AIClient:
         ).content
 
     def process_news_content(self):
-        """
-        Processes Google news articles, crawls top 3 articles for full content,
-        and runs them through the news chain for analysis.
-        """
         google_news_content = self.news_content_chain()
         google_news_with_article_content = []
 
@@ -302,6 +298,7 @@ class AIClient:
                 "title": news.title,
                 "content": article_crawler.crawl_page()
             })
+
         google_news = self.news_chain(google_news_with_article_content)
         self.news_availability = self.check_news_available(google_news)
 
@@ -406,22 +403,21 @@ class AIClient:
         return {f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile}
 
     def get_google_news_context(self):
-        """
-        Builds citation context dictionary for Google news section,
-        checking for availability and presence in citation list.
-        """
-        context = {}
+        result = {}
+        if self.news_availability.news_available:
+            context = {}
 
-        if self.google_news in self.citation_list and self.google_news:
-            if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
-                index = self.citation_list.index(self.google_news) + 1
-                context[f"[{index}]"] = self.google_news
+            if self.google_news in self.citation_list and self.google_news:
+                if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
+                    index = self.citation_list.index(self.google_news) + 1
+                    context[f"[{index}]"] = self.google_news
 
-        return context
+            result = context
+
+        return result
+
 
     def run_client(self, linkedin_url):
-        # TODO: Split this function
-
         processing_spinner_style()
         result = ""
 
@@ -459,11 +455,9 @@ class AIClient:
             ("Analyzing google news", self.process_news_content, self.get_google_news_context),
         ]
 
-        # Execute each step
         for label, chain_func, context_func in steps:
             result += self.process_with_spinner(label, chain_func, context_func) + "\n\n"
 
-        # Special: Outreach email and additional outreach
         outreach_email_input = {
             "opportunities": self.opportunities_chain(),
             "talking_point": self.talking_point_chain(),
