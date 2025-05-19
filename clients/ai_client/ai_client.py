@@ -302,8 +302,10 @@ class AIClient:
                 "title": news.title,
                 "content": article_crawler.crawl_page()
             })
+        google_news = self.news_chain(google_news_with_article_content)
+        self.news_availability = self.check_news_available(google_news)
 
-        return self.news_chain(google_news_with_article_content)
+        return google_news
 
     def create_citations(self, linkedin_url):
         citations = "## References\n"
@@ -454,7 +456,7 @@ class AIClient:
             }),
             ("Analyzing google publications", self.publications_chain,
              lambda: self.get_context_from_sources([self.publications])),
-            ("Analyzing google news...", self.process_news_content, self.get_google_news_context),
+            ("Analyzing google news", self.process_news_content, self.get_google_news_context),
         ]
 
         # Execute each step
@@ -511,7 +513,7 @@ class AIClient:
         #
         #         google_news = self.news_chain(google_news_with_article_content)
         #
-        #         self.news_availability = self.check_news_available(google_news)
+                # self.news_availability = self.check_news_available(google_news)
         #         google_news_with_citations = google_news
         #
         #         if self.news_availability.news_available:
