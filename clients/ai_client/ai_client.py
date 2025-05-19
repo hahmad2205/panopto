@@ -361,6 +361,7 @@ class AIClient:
             st.markdown('<span style="color:black;">✅ Opportunities generated...</span>', unsafe_allow_html=True)
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Opportunities generation failed...</span>', unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Identifying talking points..."):
@@ -401,6 +402,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Talking points identification failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Determining engagement style..."):
@@ -431,6 +433,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Determining engagement style failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Preparing objection handling strategies..."):
@@ -449,6 +452,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Objection handling strategies preparation failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Identifying trigger events and timing..."):
@@ -475,6 +479,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Trigger events and timing identification failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Analyzing engagement highlights..."):
@@ -498,6 +503,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Processing Engagement highlights failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Analyzing company information..."):
@@ -515,6 +521,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Analyzing company information failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Analyzing LinkedIn data..."):
@@ -532,6 +539,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Analyzing LinkedIn data failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Analyzing google publications..."):
@@ -554,6 +562,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Analyzing google publications failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Analyzing google news..."):
@@ -594,6 +603,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Analyzing google news failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Crafting personalized outreach email..."):
@@ -618,6 +628,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Crafting personalized outreach email failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Adding additional outreaches..."):
@@ -634,6 +645,7 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Adding additional outreaches failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Adding citations..."):
@@ -645,5 +657,6 @@ class AIClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         return profile_info_markdown, result

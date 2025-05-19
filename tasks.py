@@ -39,6 +39,7 @@ def process_user_details(linkedin_url, email_to):
             except Exception as e:
                 st.markdown('<span style="color:black;">❌ PDF creation failed...</span>',
                             unsafe_allow_html=True)
+                print(e)
 
             try:
                 with st.spinner("Sending email..."):
@@ -56,6 +57,7 @@ def process_user_details(linkedin_url, email_to):
             except Exception as e:
                 st.markdown('<span style="color:black;">❌ Sending email failed...</span>',
                         unsafe_allow_html=True)
+                print(e)
 
             return [200, f"Email sent to {email_to}"]
         else:
@@ -63,4 +65,5 @@ def process_user_details(linkedin_url, email_to):
 
     except Exception as e:
         logger.error(f"Error occurred while fetching user details for {linkedin_url}: {str(e)}")
+        print(e)
         raise

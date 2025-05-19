@@ -31,6 +31,7 @@ class DataClient:
             st.markdown('<span style="color:black;">✅ Linkedin profile fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Linkedin profile fetching failed...</span>', unsafe_allow_html=True)
+            print(e)
             return
 
         user_recent_company_linkedin_profile_urls = linkedin_profile_client.get_recent_experience()
@@ -48,6 +49,7 @@ class DataClient:
             st.markdown('<span style="color:black;">✅ Linkedin company profile fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Linkedin company profile fetching failed...</span>', unsafe_allow_html=True)
+            print(e)
 
         company_websites = linkedin_company_profile_client.get_company_websites()
 
@@ -61,6 +63,7 @@ class DataClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Company websites fetching failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Fetching google news..."):
@@ -70,6 +73,7 @@ class DataClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Google news fetching failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
         try:
             with st.spinner("Fetching google publications..."):
@@ -81,6 +85,7 @@ class DataClient:
         except Exception as e:
             st.markdown('<span style="color:black;">❌ Google publications fetching failed...</span>',
                         unsafe_allow_html=True)
+            print(e)
 
 
         if linkedin_profile:
@@ -92,6 +97,7 @@ class DataClient:
             except Exception as e:
                 st.markdown('<span style="color:black;">❌ Linkedin posts fetching failed...</span>',
                             unsafe_allow_html=True)
+                print(e)
 
             try:
                 with st.spinner("Fetching linkedin comments..."):
@@ -101,6 +107,7 @@ class DataClient:
             except Exception as e:
                 st.markdown('<span style="color:black;">❌ Linkedin comments fetching failed...</span>',
                             unsafe_allow_html=True)
+                print(e)
 
         self.linkedin_profile = linkedin_profile
 
