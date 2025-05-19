@@ -41,6 +41,7 @@ class AIClient:
             api_key=config("OPEN_ROUTER_API_KEY"),
             temperature=0
         )
+        self.news_availability = False
 
         self._initialize_data(linkedin_profile_id)
 
@@ -416,7 +417,6 @@ class AIClient:
 
         return result
 
-
     def run_client(self, linkedin_url):
         processing_spinner_style()
         result = ""
@@ -485,62 +485,10 @@ class AIClient:
             self.get_profile_context
         ) + "\n\n"
 
-        # result += self.process_with_spinner(
-        #     "Adding citations...",
-        #     lambda: self.create_citations(linkedin_url),
-        #     None
-        # ) + "\n\n"
+        result += self.process_with_spinner(
+            "Adding citations...",
+            lambda: self.create_citations(linkedin_url),
+            None
+        ) + "\n\n"
 
-        # try:
-        #     with st.spinner("Analyzing google news..."):
-        #         google_news_content = self.news_content_chain()
-        #         google_news_with_article_content = []
-        #
-        #         top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
-        #
-        #         for news in top_news:
-        #             article_crawler = WebsiteCrawlActor({"website_url": news.link})
-        #             google_news_with_article_content.append({
-        #                 "title": news.title,
-        #                 "content": article_crawler.crawl_page()
-        #             })
-        #
-        #         google_news = self.news_chain(google_news_with_article_content)
-        #
-                # self.news_availability = self.check_news_available(google_news)
-        #         google_news_with_citations = google_news
-        #
-        #         if self.news_availability.news_available:
-        #             context = {}
-        #             if self.google_news in self.citation_list and self.google_news:
-        #                 if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
-        #                     index = self.citation_list.index(self.google_news) + 1
-        #                     context[f"[{index}]"] = self.google_news
-        #
-        #             google_news_with_citations = self.add_citations_chain(
-        #                 google_news,
-        #                 context={
-        #                     f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-        #                     **context
-        #                 }
-        #             )
-        #         result += f"{google_news_with_citations}\n\n"
-        #
-        #     st.markdown('<span style="color:black;">✅ Google news analyzed...</span>', unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Analyzing google news failed...</span>',
-        #                 unsafe_allow_html=True)
-        #
-
-        # try:
-        with st.spinner("Adding citations..."):
-            citations = self.create_citations(linkedin_url)
-            result += f"{citations}"
-
-            st.markdown('<span style="color:black;">✅ Citations added...</span>',
-                        unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
-        #                 unsafe_allow_html=True)
-        print(result)
         return profile_info_markdown, result
