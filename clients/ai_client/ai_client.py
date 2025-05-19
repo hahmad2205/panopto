@@ -311,12 +311,12 @@ class AIClient:
         for i, item in enumerate(self.citation_list, start=1):
             if item == self.linkedin_profile:
                 name = item.get("full_name", "LinkedIn Profile")
-                citations += f"{i}. [LinkedIn Profile --- {name}]({linkedin_url})\n"
+                citations += f"{i}. [LinkedIn Profile - {name}]({linkedin_url})\n"
 
             elif item in self.companies:
                 name = item.get("name", "Company Profile")
                 url = f"https://www.linkedin.com/company/{item.get('universal_name_id')}"
-                citations += f"{i}. [LinkedIn Company Profile --- {name}]({url})\n"
+                citations += f"{i}. [LinkedIn Company Profile - {name}]({url})\n"
 
             elif item in self.companies_websites:
                 company_id = item.get("company_profile_id")
@@ -324,29 +324,29 @@ class AIClient:
                                                                                                            company_id).single().execute()
                 name = company_info.data.get("name", "Company Website")
                 url = item.get("url", "#")
-                citations += f"{i}. [Company Website --- {name}]({url})\n"
+                citations += f"{i}. [Company Website - {name}]({url})\n"
 
             elif item == self.posts:
                 name = self.linkedin_profile.get("full_name", "Posts")
                 url = f"{linkedin_url}{'' if linkedin_url.endswith('/') else '/'}recent-activity/all/"
-                citations += f"{i}. [LinkedIn Posts --- {name}]({url})\n"
+                citations += f"{i}. [LinkedIn Posts - {name}]({url})\n"
 
             elif item == self.comments:
                 name = self.linkedin_profile.get("full_name", "Comments")
                 url = f"{linkedin_url}{'' if linkedin_url.endswith('/') else '/'}recent-activity/comments/"
-                citations += f"{i}. [LinkedIn Comments --- {name}]({url})\n"
+                citations += f"{i}. [LinkedIn Comments - {name}]({url})\n"
 
             elif item == self.publications or item == self.scholar_profile:
                 name = self.scholar_profile.get("name", "Google Scholar")
                 author_id = self.scholar_profile.get("author_id", "")
                 url = f"https://scholar.google.com/citations?user={author_id}&hl=en&oi=ao"
-                citations += f"{i}. [Google Publications --- {name}]({url})\n"
+                citations += f"{i}. [Google Publications - {name}]({url})\n"
 
             elif item == self.google_news and self.news_availability.news_available:
                 name = self.linkedin_profile.get("full_name", "Google News")
                 query = name.replace(" ", "+")
                 url = f"https://www.google.com/search?q={query}&tbm=nws"
-                citations += f"{i}. [Google News --- {name}]({url})\n"
+                citations += f"{i}. [Google News - {name}]({url})\n"
 
         return citations
 
@@ -361,7 +361,7 @@ class AIClient:
             f"# {self.linkedin_profile.get('full_name').title()}\n"
             f"{current_experience_lines}  \n"
             f"{self.linkedin_profile.get('city')}, {self.linkedin_profile.get('state')}, {self.linkedin_profile.get('country')}  \n"
-            f"🔗 [LinkedIn]({linkedin_url})  \n"
+            f"[LinkedIn]({linkedin_url})  \n"
         )
         return profile_info_markdown
 
