@@ -454,7 +454,7 @@ class AIClient:
             }),
             ("Analyzing google publications", self.publications_chain,
              lambda: self.get_context_from_sources([self.publications])),
-            # ("Analyzing google news...", self.process_news_content, self.get_google_news_context),
+            ("Analyzing google news...", self.process_news_content, self.get_google_news_context),
         ]
 
         # Execute each step
