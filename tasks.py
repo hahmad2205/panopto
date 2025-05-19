@@ -20,7 +20,7 @@ def process_user_details(linkedin_url, email_to):
             .select(
                 "*"
             )
-            .eq("id", 230)
+            .eq("id", 234)
             .single()
             .execute()
         ).data
