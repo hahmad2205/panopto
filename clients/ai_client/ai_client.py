@@ -350,7 +350,7 @@ class AIClient:
                 output = chain_func()
                 if citation_context_func:
                     context = citation_context_func()
-                    return self.add_citations_chain(output, context)
+                    output = self.add_citations_chain(output, context)
                 st.markdown(f'<span style="color:black;">✅ {label}...</span>',
                             unsafe_allow_html=True)
                 return output
@@ -358,7 +358,7 @@ class AIClient:
             st.markdown(f'<span style="color:black;">❌ {label} failed...</span>', unsafe_allow_html=True)
             return ""
 
-    def get_context_from_sources(self, sources: list) -> dict:
+    def get_context_from_sources(self, sources):
         context = {}
         for source in sources:
             if source in self.citation_list:
@@ -373,13 +373,13 @@ class AIClient:
                     context[f"[{index}]"] = data
         return context
 
-    def get_company_context(self) -> dict:
+    def get_company_context(self):
         return {
             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies},
             **{f"[{self.citation_list.index(site) + 1}]": site for site in self.companies_websites},
         }
 
-    def get_profile_context(self) -> dict:
+    def get_profile_context(self):
         return {f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile}
 
     def run_client(self, linkedin_url):
@@ -749,15 +749,15 @@ class AIClient:
         #     st.markdown('<span style="color:black;">❌ Adding additional outreaches failed...</span>',
         #                 unsafe_allow_html=True)
         #
-        try:
-            with st.spinner("Adding citations..."):
-                citations = self.create_citations(linkedin_url)
-                result += f"{citations}"
+        # try:
+        with st.spinner("Adding citations..."):
+            citations = self.create_citations(linkedin_url)
+            result += f"{citations}"
 
-                st.markdown('<span style="color:black;">✅ Citations added...</span>',
-                            unsafe_allow_html=True)
-        except Exception as e:
-            st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
+            st.markdown('<span style="color:black;">✅ Citations added...</span>',
                         unsafe_allow_html=True)
+        # except Exception as e:
+        #     st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
+        #                 unsafe_allow_html=True)
         print(result)
         return profile_info_markdown, result
