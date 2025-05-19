@@ -67,7 +67,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
                 background-color: #1A1A1A;
                 padding: 20px 40px;
                 margin-top: 10px;
-                border-bottom: 5px solid #28B566;
+                border-bottom: 10px solid #28B566;
             }}
             .profile-info a {{
                 color: #CCCCCC;
