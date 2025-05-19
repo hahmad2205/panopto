@@ -5,7 +5,6 @@ import streamlit as st
 from clients.ai_client.ai_client import AIClient
 from clients.data_client.data_client import DataClient
 from clients.email_client.email_client import EmailClient
-from supabase_client import supabase_client
 from utils import markdown_to_pdf
 
 logger = logging.getLogger(__name__)
@@ -14,16 +13,7 @@ logger = logging.getLogger(__name__)
 def process_user_details(linkedin_url, email_to):
     try:
         data_client = DataClient()
-        # linkedin_profile = data_client.fetch_user_data(linkedin_url)
-        linkedin_profile = profile_resp = (
-            supabase_client.table("sdr_agent_linkedinprofile")
-            .select(
-                "*"
-            )
-            .eq("id", 234)
-            .single()
-            .execute()
-        ).data
+        linkedin_profile = data_client.fetch_user_data(linkedin_url)
 
         if linkedin_profile:
             ai_client = AIClient(linkedin_profile.get("id"))
