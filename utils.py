@@ -123,9 +123,10 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
         "page-size": "A4",
         "encoding": "UTF-8",
         "enable-local-file-access": "",
-        "footer-center": "[page]/[topage]",
+        "margin-top": "0mm",
+        "margin-right": "0mm",
+        "margin-left": "0mm",
         "margin-bottom": "20mm",
-        # Use these wkhtmltopdf options to properly handle page breaks and footers
         "footer-html": "footer.html"
     }
 
