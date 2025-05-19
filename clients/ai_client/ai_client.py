@@ -419,11 +419,10 @@ class AIClient:
 
     def run_client(self, linkedin_url):
         processing_spinner_style()
-        result = ""
+        result = "## Sales Insights\n"
 
         profile_info_markdown = self.process_profile_info(linkedin_url)
-        result += f"{profile_info_markdown}\n\n## Sales Insights\n"
-        #
+
         steps = [
             ("Generating opportunities", self.opportunities_chain, lambda: {
                 **self.get_profile_context(),
@@ -435,60 +434,60 @@ class AIClient:
             ("Determining engagement style", self.engagement_style_chain, lambda: self.get_context_from_sources([
                 self.posts, self.comments
             ])),
-            # ("Preparing objection handling strategies", self.objection_handling_chain, lambda: {
-            #     **self.get_profile_context(),
-            #     **self.get_company_context()
-            # }),
-            # ("Identifying trigger events and timing", self.trigger_events_and_timing_chain, lambda: {
-            #     **self.get_company_context(),
-            #     **self.get_context_from_sources([self.posts])
-            # }),
-            # ("Analyzing engagement highlights", self.engagement_highlights_chain,
-            #  lambda: self.get_context_from_sources([self.posts])),
-            # ("Analyzing company information", self.about_company_chain, self.get_company_context),
-            # ("Analyzing LinkedIn data", self.linkedin_data_chain, lambda: {
-            #     **self.get_profile_context(),
-            #     **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
-            # }),
-            # ("Analyzing google publications", self.publications_chain,
-            #  lambda: self.get_context_from_sources([self.publications])),
-            # ("Analyzing google news", self.process_news_content, self.get_google_news_context),
+            ("Preparing objection handling strategies", self.objection_handling_chain, lambda: {
+                **self.get_profile_context(),
+                **self.get_company_context()
+            }),
+            ("Identifying trigger events and timing", self.trigger_events_and_timing_chain, lambda: {
+                **self.get_company_context(),
+                **self.get_context_from_sources([self.posts])
+            }),
+            ("Analyzing engagement highlights", self.engagement_highlights_chain,
+             lambda: self.get_context_from_sources([self.posts])),
+            ("Analyzing company information", self.about_company_chain, self.get_company_context),
+            ("Analyzing LinkedIn data", self.linkedin_data_chain, lambda: {
+                **self.get_profile_context(),
+                **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
+            }),
+            ("Analyzing google publications", self.publications_chain,
+             lambda: self.get_context_from_sources([self.publications])),
+            ("Analyzing google news", self.process_news_content, self.get_google_news_context),
         ]
 
         for label, chain_func, context_func in steps:
             result += self.process_with_spinner(label, chain_func, context_func) + "\n\n"
-        #
-        # outreach_email_input = {
-        #     "opportunities": self.opportunities_chain(),
-        #     "talking_point": self.talking_point_chain(),
-        #     "engagement_highlights": self.engagement_highlights_chain(),
-        #     "objection_handling": self.objection_handling_chain(),
-        #     "trigger_events_and_timing": self.trigger_events_and_timing_chain(),
-        #     "engagement_style": self.engagement_style_chain(),
-        #     "about_company": self.about_company_chain(),
-        #     "linkedin_data": self.linkedin_data_chain(),
-        #     "sell_for_education": self.knowledge_base.get("sell_for_education"),
-        #     "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
-        #     "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
-        #     "pitches": self.knowledge_base.get("pitches"),
-        #     "access_ai": self.knowledge_base.get("ai_summary"),
-        # }
-        # result += self.process_with_spinner(
-        #     "Crafting personalized outreach email...",
-        #     lambda: self.outreach_email_chain(outreach_email_input),
-        #     None
-        # ) + "\n\n"
-        #
-        # result += self.process_with_spinner(
-        #     "Adding additional outreaches...",
-        #     self.suggested_additional_outreach,
-        #     self.get_profile_context
-        # ) + "\n\n"
-        #
-        # result += self.process_with_spinner(
-        #     "Adding citations...",
-        #     lambda: self.create_citations(linkedin_url),
-        #     None
-        # ) + "\n\n"
+
+        outreach_email_input = {
+            "opportunities": self.opportunities_chain(),
+            "talking_point": self.talking_point_chain(),
+            "engagement_highlights": self.engagement_highlights_chain(),
+            "objection_handling": self.objection_handling_chain(),
+            "trigger_events_and_timing": self.trigger_events_and_timing_chain(),
+            "engagement_style": self.engagement_style_chain(),
+            "about_company": self.about_company_chain(),
+            "linkedin_data": self.linkedin_data_chain(),
+            "sell_for_education": self.knowledge_base.get("sell_for_education"),
+            "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
+            "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
+            "pitches": self.knowledge_base.get("pitches"),
+            "access_ai": self.knowledge_base.get("ai_summary"),
+        }
+        result += self.process_with_spinner(
+            "Crafting personalized outreach email...",
+            lambda: self.outreach_email_chain(outreach_email_input),
+            None
+        ) + "\n\n"
+
+        result += self.process_with_spinner(
+            "Adding additional outreaches...",
+            self.suggested_additional_outreach,
+            self.get_profile_context
+        ) + "\n\n"
+
+        result += self.process_with_spinner(
+            "Adding citations...",
+            lambda: self.create_citations(linkedin_url),
+            None
+        ) + "\n\n"
 
         return profile_info_markdown, result
