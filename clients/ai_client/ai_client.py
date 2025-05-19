@@ -41,6 +41,7 @@ class AIClient:
             api_key=config("OPEN_ROUTER_API_KEY"),
             temperature=0
         )
+        self.news_availability = False
 
         self._initialize_data(linkedin_profile_id)
 
@@ -570,7 +571,7 @@ class AIClient:
                 google_news_with_article_content = []
 
                 top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
-
+                print(top_news)
                 for news in top_news:
                     article_crawler = WebsiteCrawlActor({"website_url": news.link})
                     google_news_with_article_content.append({
