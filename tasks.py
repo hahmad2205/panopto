@@ -27,11 +27,11 @@ def process_user_details(linkedin_url, email_to):
 
         if linkedin_profile:
             ai_client = AIClient(linkedin_profile.get("id"))
-            markdown_text = ai_client.run_client(linkedin_url)
+            profile_with_markdown, markdown_text = ai_client.run_client(linkedin_url)
 
             try:
                 with st.spinner("Creating PDF..."):
-                    pdf = markdown_to_pdf(markdown_text)
+                    pdf = markdown_to_pdf(profile_with_markdown, markdown_text)
                     final_pdf, storage_path = data_client.store_processed_profile(pdf, markdown_text, email_to)
 
                     st.markdown('<span style="color:black;">✅ PDF created...</span>',

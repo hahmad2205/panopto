@@ -760,4 +760,4 @@ class AIClient:
         #     st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
         #                 unsafe_allow_html=True)
         print(result)
-        return result
+        return profile_info_markdown, result
