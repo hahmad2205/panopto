@@ -134,7 +134,7 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
         "margin-top": "5mm",
         "margin-right": "0mm",
         "margin-left": "0mm",
-        "margin-bottom": "20mm",
+        "margin-bottom": "10mm",
         "footer-html": "footer.html"
     }
 
