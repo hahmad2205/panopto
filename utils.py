@@ -8,119 +8,6 @@ import requests
 import streamlit as st
 
 
-def show_checklist():
-    """
-    Display a checklist showing the status of each task in st.session_state.completed_jobs.
-    - Show loader if status is "pending"
-    - Show tick if status is "completed"
-    - Skip tasks with status "initialized"
-    """
-
-    if "completed_jobs" not in st.session_state:
-        st.warning("No job status available.")
-        return False
-
-    checklist_items = [
-        (key, status)
-        for key, status in st.session_state.completed_jobs.items()
-        if status != "initialized"
-    ]
-    checklist_containers = []
-
-    for key, status in checklist_items:
-        container = st.empty()
-        checklist_containers.append((key, status, container))
-
-    for key, status, container in checklist_containers:
-        pretty_name = key.replace("_", " ").capitalize()
-
-        if status == "completed":
-            container.markdown(
-                f"""
-                <div style="display: flex; align-items: center; margin: 4px 0;">
-                    <div style="width: 24px; height: 24px; margin-right: 10px;">
-                        <span style="color: #28a745; font-size: 20px;">✓</span>
-                    </div>
-                    <span style="color: #28a745;">{pretty_name}</span>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        elif status == "pending":
-            container.markdown(
-                f"""
-                <div style="display: flex; align-items: center; margin: 4px 0;">
-                    <div style="width: 24px; height: 24px; margin-right: 10px;">
-                        <div class="loader" style="border: 2px solid #ccc; border-top: 2px solid #333; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite;"></div>
-                    </div>
-                    <span style="color: #666;">{pretty_name}...</span>
-                </div>
-                <style>
-                    @keyframes spin {{
-                        0% {{ transform: rotate(0deg); }}
-                        100% {{ transform: rotate(360deg); }}
-                    }}
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-
-        time.sleep(0.1)
-
-    return True
-
-
-def add_progress_styles():
-    """
-    Add custom CSS styles for the checklist
-    """
-    st.markdown(
-        """
-    <style>
-    /* Checklist container styling */
-    .checklist-container {
-        background-color: #f8f9ff;
-        border-radius: 12px;
-        padding: 20px;
-        margin: 20px 0;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* Loading animation */
-    .loader {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #f3f3f3;
-        border-top: 2px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Checklist item styling */
-    .checklist-item {
-        display: flex;
-        align-items: center;
-        padding: 8px 0;
-        transition: all 0.3s ease;
-    }
-
-    /* Completed item styling */
-    .completed {
-        color: #28a745;
-    }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
-
-
 def call_api(method, url, headers, params=None):
     response = requests.request(method=method, url=url, params=params, headers=headers)
     return response.json()
@@ -170,6 +57,8 @@ def markdown_to_pdf(profile_with_markdown, markdown_content):
             body {{
                 font-family: "Open Sans", sans-serif;
                 color: #666666;
+                margin: 0;
+                padding: 0;
             }}
             .profile-info {{
                 color: #CCCCCC;  
