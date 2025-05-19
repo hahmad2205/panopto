@@ -11,12 +11,22 @@ class WebsiteCrawlActor:
 
     def __init__(self, website):
         self.client = ApifyClient(config("APIFY_API_KEY"))
-        self.website_id = website["id"]
+        self.website_id = website.get("id")
         self.run_input = {
             "startUrls": [{"url": website["website_url"]}],
             "maxCrawlPages": 1,
             "maxCrawlDepth": 0,
         }
+
+    def crawl_page(self):
+        run = self.client.actor(config("WEBSITE_CRAWLER_ACTOR_ID")).call(run_input=self.run_input)
+        iterator = self.client.dataset(run["defaultDatasetId"]).iterate_items()
+        content = []
+
+        for item in iterator:
+            content.append(item["text"])
+
+        return content
 
     def store_company_website(self):
         try:
