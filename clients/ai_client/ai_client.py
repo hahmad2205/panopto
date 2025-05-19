@@ -454,11 +454,11 @@ class AIClient:
             self.get_profile_context
         ) + "\n\n"
 
-        result += self.process_with_spinner(
-            "Adding citations...",
-            lambda: self.create_citations(linkedin_url),
-            None
-        ) + "\n\n"
+        # result += self.process_with_spinner(
+        #     "Adding citations...",
+        #     lambda: self.create_citations(linkedin_url),
+        #     None
+        # ) + "\n\n"
 
         # try:
         #     with st.spinner("Generating opportunities..."):
@@ -749,15 +749,15 @@ class AIClient:
         #     st.markdown('<span style="color:black;">❌ Adding additional outreaches failed...</span>',
         #                 unsafe_allow_html=True)
         #
-        # try:
-        #     with st.spinner("Adding citations..."):
-        #         citations = self.create_citations(linkedin_url)
-        #         result += f"{citations}"
-        #
-        #         st.markdown('<span style="color:black;">✅ Citations added...</span>',
-        #                     unsafe_allow_html=True)
-        # except Exception as e:
-        #     st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
-        #                 unsafe_allow_html=True)
+        try:
+            with st.spinner("Adding citations..."):
+                citations = self.create_citations(linkedin_url)
+                result += f"{citations}"
+
+                st.markdown('<span style="color:black;">✅ Citations added...</span>',
+                            unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown('<span style="color:black;">❌ Adding citations failed...</span>',
+                        unsafe_allow_html=True)
         print(result)
         return profile_info_markdown, result
