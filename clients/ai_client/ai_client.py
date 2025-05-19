@@ -565,48 +565,48 @@ class AIClient:
         #                 unsafe_allow_html=True)
         #     print(e)
 
-        try:
-            with st.spinner("Analyzing google news..."):
-                google_news_content = self.news_content_chain()
-                google_news_with_article_content = []
-                print(google_news_content)
-                print(type(google_news_content))
-                top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
-                print(top_news)
-                for news in top_news:
-                    article_crawler = WebsiteCrawlActor({"website_url": news.link})
-                    google_news_with_article_content.append({
-                        "title": news.title,
-                        "content": article_crawler.crawl_page()
-                    })
+        # try:
+        with st.spinner("Analyzing google news..."):
+            google_news_content = self.news_content_chain()
+            google_news_with_article_content = []
+            print(google_news_content)
+            print(type(google_news_content))
+            top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
+            print(top_news)
+            for news in top_news:
+                article_crawler = WebsiteCrawlActor({"website_url": news.link})
+                google_news_with_article_content.append({
+                    "title": news.title,
+                    "content": article_crawler.crawl_page()
+                })
 
-                google_news = self.news_chain(google_news_with_article_content)
+            google_news = self.news_chain(google_news_with_article_content)
 
-                self.news_availability = self.check_news_available(google_news)
-                google_news_with_citations = google_news
+            self.news_availability = self.check_news_available(google_news)
+            google_news_with_citations = google_news
 
-                if self.news_availability.news_available:
-                    context = {}
-                    if self.google_news in self.citation_list and self.google_news:
-                        if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
-                            index = self.citation_list.index(self.google_news) + 1
-                            context[f"[{index}]"] = self.google_news
+            if self.news_availability.news_available:
+                context = {}
+                if self.google_news in self.citation_list and self.google_news:
+                    if not (isinstance(self.google_news, (list, dict)) and not self.google_news):
+                        index = self.citation_list.index(self.google_news) + 1
+                        context[f"[{index}]"] = self.google_news
 
-                    google_news_with_citations = self.add_citations_chain(
-                        google_news,
-                        context={
-                            f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
-                            **context
-                        }
-                    )
-                result += f"{google_news_with_citations}\n\n"
+                google_news_with_citations = self.add_citations_chain(
+                    google_news,
+                    context={
+                        f"[{self.citation_list.index(self.linkedin_profile) + 1}]": self.linkedin_profile,
+                        **context
+                    }
+                )
+            result += f"{google_news_with_citations}\n\n"
 
-            st.markdown('<span style="color:black;">✅ Google News Analyzed...</span>', unsafe_allow_html=True)
-        except Exception as e:
-            st.markdown('<span style="color:black;">❌ Analyzing google news failed...</span>',
-                        unsafe_allow_html=True)
-            print("News Error")
-            print(e)
+        st.markdown('<span style="color:black;">✅ Google News Analyzed...</span>', unsafe_allow_html=True)
+        # except Exception as e:
+        #     st.markdown('<span style="color:black;">❌ Analyzing google news failed...</span>',
+        #                 unsafe_allow_html=True)
+        #     print("News Error")
+        #     print(e)
 
         # try:
         #     with st.spinner("Crafting personalized outreach email..."):
