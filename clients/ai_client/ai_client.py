@@ -569,7 +569,8 @@ class AIClient:
             with st.spinner("Analyzing google news..."):
                 google_news_content = self.news_content_chain()
                 google_news_with_article_content = []
-
+                print(google_news_content)
+                print(type(google_news_content))
                 top_news = google_news_content.news[:3] if hasattr(google_news_content, 'news') and isinstance(google_news_content.news, list) else []
                 print(top_news)
                 for news in top_news:
