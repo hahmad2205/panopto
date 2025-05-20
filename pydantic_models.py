@@ -18,4 +18,3 @@ class GoogleNewsConfig(BaseModel):
 
 class GoogleNews(BaseModel):
     news: list[GoogleNewsConfig]
-

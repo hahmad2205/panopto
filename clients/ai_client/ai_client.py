@@ -349,18 +349,18 @@ class AIClient:
         return profile_info_markdown
 
     def _process_with_spinner(self, label, chain_function, citation_context_function=None):
-        try:
-            with st.spinner(f"{label}..."):
-                output = chain_function()
-                if citation_context_function:
-                    context = citation_context_function()
-                    output = self._add_citations_chain(output, context)
-                st.markdown(f'<span style="color:black;">✅ {label}...</span>',
-                            unsafe_allow_html=True)
-                return output
-        except Exception as e:
-            st.markdown(f'<span style="color:black;">❌ {label} failed...</span>', unsafe_allow_html=True)
-            return ""
+        # try:
+        with st.spinner(f"{label}..."):
+            output = chain_function()
+            if citation_context_function:
+                context = citation_context_function()
+                output = self._add_citations_chain(output, context)
+            st.markdown(f'<span style="color:black;">✅ {label}...</span>',
+                        unsafe_allow_html=True)
+            return output
+        # except Exception as e:
+        #     st.markdown(f'<span style="color:black;">❌ {label} failed...</span>', unsafe_allow_html=True)
+        #     return ""
 
     def _get_context_from_sources(self, sources):
         context = {}
