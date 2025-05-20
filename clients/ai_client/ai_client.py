@@ -290,6 +290,7 @@ class AIClient:
 
     def _create_citations(self, linkedin_url):
         citations = "## References\n"
+        print(self.citation_list)
 
         for index, citation_content in enumerate(self.citation_list, start=1):
             if citation_content == self.linkedin_profile:
@@ -335,7 +336,7 @@ class AIClient:
 
     def _create_profile_header_markdown(self, linkedin_url):
         current_experience_lines = "\n".join(
-            f"{current_experience.get('title').title() if current_experience.get('title') else None} | {current_experience.get('company').strip() if current_experience.get('company').strip() else None}  "
+            f"{current_experience.get('title').title() if current_experience.get('title') else None} | {current_experience.get('company').strip() if current_experience.get('company') else None}  "
             for current_experience in self.linkedin_profile.get("experiences")
             if not current_experience.get("ends_at")
         )
@@ -428,80 +429,80 @@ class AIClient:
         llm_output = {}
         profile_info_markdown = self._create_profile_header_markdown(linkedin_url)
 
-        self.user_google_news = self._process_with_spinner(
-            "Analyzing google news",
-            self._process_google_news_content,
-            self._get_google_news_context
-        ) + "\n\n"
-        self.user_publications = self._process_with_spinner(
-            "Analyzing google publications",
-            self._publications_chain,
-            lambda: self._get_context_from_sources([self.publications])
-        ) + "\n\n"
-
-        steps = [
-            (
-                "Generating opportunities", "opportunities", self._opportunities_chain,
-                lambda: {
-                    **self._get_profile_context(),
-                    **self._get_company_context()
-                }
-            ),
-            (
-                "Identifying talking points", "talking_point", self._talking_point_chain,
-                lambda: self._get_context_from_sources(
-                    [self.linkedin_profile, self.posts, self.comments, self.google_news, self.publications]
-                )
-            ),
-            (
-                "Determining engagement style", "engagement_style", self._engagement_style_chain,
-                lambda: self._get_context_from_sources(
-                    [self.posts, self.comments]
-                )
-            ),
-            (
-                "Preparing objection handling strategies", "objection_handling",  self._objection_handling_chain,
-                lambda: {
-                    **self._get_profile_context(),
-                    **self._get_company_context()
-                }
-            ),
-            (
-                "Identifying trigger events and timing", "trigger_events_and_timing", self._trigger_events_and_timing_chain,
-                lambda: {
-                    **self._get_company_context(),
-                    **self._get_context_from_sources([self.posts])
-                }
-            ),
-            (
-                "Analyzing engagement highlights", "engagement_highlights", self._engagement_highlights_chain,
-                lambda: self._get_context_from_sources([self.posts])
-            ),
-            (
-                "Analyzing company information", "about_company", self._company_about_chain, self._get_company_context
-            ),
-            (
-                "Analyzing LinkedIn data", "linkedin_data", self._linkedin_data_chain,
-                lambda: {
-                    **self._get_profile_context(),
-                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
-                }
-            ),
-        ]
-
-        for label, key, chain_function, context_function in steps:
-            llm_output[key] = self._process_with_spinner(label, chain_function, context_function)
-            result += llm_output[key] + "\n\n"
-
-        result += self.user_publications + self.user_google_news
-
-        result += self._create_additional_outreach_email(llm_output)
-
-        result += self._process_with_spinner(
-            "Adding additional outreaches",
-            self._suggested_additional_outreach_chain,
-            self._get_profile_context
-        ) + "\n\n"
+        # self.user_google_news = self._process_with_spinner(
+        #     "Analyzing google news",
+        #     self._process_google_news_content,
+        #     self._get_google_news_context
+        # ) + "\n\n"
+        # self.user_publications = self._process_with_spinner(
+        #     "Analyzing google publications",
+        #     self._publications_chain,
+        #     lambda: self._get_context_from_sources([self.publications])
+        # ) + "\n\n"
+        #
+        # steps = [
+        #     (
+        #         "Generating opportunities", "opportunities", self._opportunities_chain,
+        #         lambda: {
+        #             **self._get_profile_context(),
+        #             **self._get_company_context()
+        #         }
+        #     ),
+        #     (
+        #         "Identifying talking points", "talking_point", self._talking_point_chain,
+        #         lambda: self._get_context_from_sources(
+        #             [self.linkedin_profile, self.posts, self.comments, self.google_news, self.publications]
+        #         )
+        #     ),
+        #     (
+        #         "Determining engagement style", "engagement_style", self._engagement_style_chain,
+        #         lambda: self._get_context_from_sources(
+        #             [self.posts, self.comments]
+        #         )
+        #     ),
+        #     (
+        #         "Preparing objection handling strategies", "objection_handling",  self._objection_handling_chain,
+        #         lambda: {
+        #             **self._get_profile_context(),
+        #             **self._get_company_context()
+        #         }
+        #     ),
+        #     (
+        #         "Identifying trigger events and timing", "trigger_events_and_timing", self._trigger_events_and_timing_chain,
+        #         lambda: {
+        #             **self._get_company_context(),
+        #             **self._get_context_from_sources([self.posts])
+        #         }
+        #     ),
+        #     (
+        #         "Analyzing engagement highlights", "engagement_highlights", self._engagement_highlights_chain,
+        #         lambda: self._get_context_from_sources([self.posts])
+        #     ),
+        #     (
+        #         "Analyzing company information", "about_company", self._company_about_chain, self._get_company_context
+        #     ),
+        #     (
+        #         "Analyzing LinkedIn data", "linkedin_data", self._linkedin_data_chain,
+        #         lambda: {
+        #             **self._get_profile_context(),
+        #             **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
+        #         }
+        #     ),
+        # ]
+        #
+        # for label, key, chain_function, context_function in steps:
+        #     llm_output[key] = self._process_with_spinner(label, chain_function, context_function)
+        #     result += llm_output[key] + "\n\n"
+        #
+        # result += self.user_publications + self.user_google_news
+        #
+        # result += self._create_additional_outreach_email(llm_output)
+        #
+        # result += self._process_with_spinner(
+        #     "Adding additional outreaches",
+        #     self._suggested_additional_outreach_chain,
+        #     self._get_profile_context
+        # ) + "\n\n"
 
         result += self._process_with_spinner(
             "Adding citations",
