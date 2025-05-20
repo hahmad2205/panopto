@@ -290,7 +290,6 @@ class AIClient:
 
     def _create_citations(self, linkedin_url):
         citations = "## References\n"
-        print(self.citation_list)
 
         for index, citation_content in enumerate(self.citation_list, start=1):
             if citation_content == self.linkedin_profile:
@@ -303,6 +302,7 @@ class AIClient:
                 citations += f"{index}. [LinkedIn Company Profile - {name}]({url})\n"
 
             elif citation_content in self.companies_websites:
+                print(citation_content)
                 company_id = citation_content.get("company_profile_id")
                 company_info = supabase_client.table("sdr_agent_companylinkedinprofile").select("name").eq("id",
                                                                                                            company_id).single().execute()
