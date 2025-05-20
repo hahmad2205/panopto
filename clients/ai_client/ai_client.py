@@ -66,9 +66,6 @@ class AIClient:
 
         self.companies_websites = [website for company in self.companies for website in
                                    company.get("sdr_agent_companywebsite", [])]
-        # self.companies_websites = []
-        # for company in self.companies:
-        #     self.companies_websites.extend(company.get("sdr_agent_companywebsite", []))
 
         remove_linkedin_profile_items = [
             "sdr_agent_companylinkedinprofile",
@@ -329,7 +326,7 @@ class AIClient:
                 url = f"https://scholar.google.com/citations?user={author_id}&hl=en&oi=ao"
                 citations += f"{index}. [Google Publications - {name}]({url})\n"
 
-            elif citation_content == self.google_news and self.news_availability.news_available:
+            elif citation_content == self.google_news and self.news_availability and self.news_availability.news_available:
                 name = self.linkedin_profile.get("full_name", "Google News")
                 query = name.replace(" ", "+")
                 url = f"https://www.google.com/search?q={query}&tbm=nws"
