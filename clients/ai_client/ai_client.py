@@ -507,19 +507,19 @@ class AIClient:
             "access_ai": self.knowledge_base.get("ai_summary"),
         }
         result += self.process_with_spinner(
-            "Crafting personalized outreach email...",
+            "Crafting personalized outreach email",
             lambda: self.outreach_email_chain(outreach_email_input),
             None
         ) + "\n\n"
 
         result += self.process_with_spinner(
-            "Adding additional outreaches...",
+            "Adding additional outreaches",
             self.suggested_additional_outreach,
             self.get_profile_context
         ) + "\n\n"
 
         result += self.process_with_spinner(
-            "Adding citations...",
+            "Adding citations",
             lambda: self.create_citations(linkedin_url),
             None
         ) + "\n\n"
