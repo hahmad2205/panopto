@@ -64,7 +64,11 @@ class AIClient:
         self.scholar_profile = profile.get("sdr_agent_googlescholarprofile")
         self.publications = self.scholar_profile.get("sdr_agent_googlepublication", []) if self.scholar_profile else []
 
-        self.companies_websites = [company.get("sdr_agent_companywebsite", []) for company in self.companies]
+        self.companies_websites = [website for company in self.companies for website in
+                                   company.get("sdr_agent_companywebsite", [])]
+        # self.companies_websites = []
+        # for company in self.companies:
+        #     self.companies_websites.extend(company.get("sdr_agent_companywebsite", []))
 
         remove_linkedin_profile_items = [
             "sdr_agent_companylinkedinprofile",
@@ -302,7 +306,6 @@ class AIClient:
                 citations += f"{index}. [LinkedIn Company Profile - {name}]({url})\n"
 
             elif citation_content in self.companies_websites:
-                print(citation_content)
                 company_id = citation_content.get("company_profile_id")
                 company_info = supabase_client.table("sdr_agent_companylinkedinprofile").select("name").eq("id",
                                                                                                            company_id).single().execute()
