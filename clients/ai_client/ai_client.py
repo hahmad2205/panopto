@@ -423,7 +423,7 @@ class AIClient:
         cached_outputs = {}
 
         profile_info_markdown = self.process_profile_info(linkedin_url)
-        result += f"{profile_info_markdown}\n\n## Sales Insights\n"
+        result += "## Sales Insights\n"
         self.user_google_news = self.process_with_spinner(
             "Analyzing google news",
             self.process_news_content,
@@ -524,4 +524,4 @@ class AIClient:
             None
         ) + "\n\n"
 
-        return result
+        return profile_info_markdown, result
