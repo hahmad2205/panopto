@@ -175,8 +175,8 @@ class AIClient:
                 "linkedin_education": self.linkedin_profile.get("education"),
                 "linkedin_posts": self.posts,
                 "linkedin_comments": self.comments,
-                "publications": self.publications,
-                "news": self.google_news,
+                "publications": self.user_publications,
+                "news": self.user_google_news,
                 "connect": self.knowledge_base.get("connect"),
                 "ai_summary": self.knowledge_base.get("ai_summary"),
                 "knowledge_insights": self.knowledge_base.get("knowledge_insights")
@@ -311,12 +311,12 @@ class AIClient:
         for i, item in enumerate(self.citation_list, start=1):
             if item == self.linkedin_profile:
                 name = item.get("full_name", "LinkedIn Profile")
-                citations += f"{i}. [LinkedIn Profile - {name}]({linkedin_url})\n"
+                citations += f"{i}. [LinkedIn Profile --- {name}]({linkedin_url})\n"
 
             elif item in self.companies:
                 name = item.get("name", "Company Profile")
                 url = f"https://www.linkedin.com/company/{item.get('universal_name_id')}"
-                citations += f"{i}. [LinkedIn Company Profile - {name}]({url})\n"
+                citations += f"{i}. [LinkedIn Company Profile --- {name}]({url})\n"
 
             elif item in self.companies_websites:
                 company_id = item.get("company_profile_id")
@@ -324,29 +324,29 @@ class AIClient:
                                                                                                            company_id).single().execute()
                 name = company_info.data.get("name", "Company Website")
                 url = item.get("url", "#")
-                citations += f"{i}. [Company Website - {name}]({url})\n"
+                citations += f"{i}. [Company Website --- {name}]({url})\n"
 
             elif item == self.posts:
                 name = self.linkedin_profile.get("full_name", "Posts")
                 url = f"{linkedin_url}{'' if linkedin_url.endswith('/') else '/'}recent-activity/all/"
-                citations += f"{i}. [LinkedIn Posts - {name}]({url})\n"
+                citations += f"{i}. [LinkedIn Posts --- {name}]({url})\n"
 
             elif item == self.comments:
                 name = self.linkedin_profile.get("full_name", "Comments")
                 url = f"{linkedin_url}{'' if linkedin_url.endswith('/') else '/'}recent-activity/comments/"
-                citations += f"{i}. [LinkedIn Comments - {name}]({url})\n"
+                citations += f"{i}. [LinkedIn Comments --- {name}]({url})\n"
 
             elif item == self.publications or item == self.scholar_profile:
                 name = self.scholar_profile.get("name", "Google Scholar")
                 author_id = self.scholar_profile.get("author_id", "")
                 url = f"https://scholar.google.com/citations?user={author_id}&hl=en&oi=ao"
-                citations += f"{i}. [Google Publications - {name}]({url})\n"
+                citations += f"{i}. [Google Publications --- {name}]({url})\n"
 
             elif item == self.google_news and self.news_availability.news_available:
                 name = self.linkedin_profile.get("full_name", "Google News")
                 query = name.replace(" ", "+")
                 url = f"https://www.google.com/search?q={query}&tbm=nws"
-                citations += f"{i}. [Google News - {name}]({url})\n"
+                citations += f"{i}. [Google News --- {name}]({url})\n"
 
         return citations
 
@@ -361,7 +361,7 @@ class AIClient:
             f"# {self.linkedin_profile.get('full_name').title()}\n"
             f"{current_experience_lines}  \n"
             f"{self.linkedin_profile.get('city')}, {self.linkedin_profile.get('state')}, {self.linkedin_profile.get('country')}  \n"
-            f"[LinkedIn]({linkedin_url})  \n"
+            f"🔗 [LinkedIn]({linkedin_url})  \n"
         )
         return profile_info_markdown
 
@@ -419,53 +419,87 @@ class AIClient:
 
     def run_client(self, linkedin_url):
         processing_spinner_style()
-        result = "## Sales Insights\n"
+        result = ""
+        cached_outputs = {}
 
         profile_info_markdown = self.process_profile_info(linkedin_url)
+        result += f"{profile_info_markdown}\n\n## Sales Insights\n"
+        self.user_google_news = self.process_with_spinner(
+            "Analyzing google news",
+            self.process_news_content,
+            self.get_google_news_context
+        ) + "\n\n"
+        self.user_publications = self.process_with_spinner(
+            "Analyzing google publications",
+            self.publications_chain,
+            lambda: self.get_context_from_sources([self.publications])
+        ) + "\n\n"
 
         steps = [
-            ("Generating opportunities", self.opportunities_chain, lambda: {
-                **self.get_profile_context(),
-                **self.get_company_context()
-            }),
-            ("Identifying talking points", self.talking_point_chain, lambda: self.get_context_from_sources([
-                self.linkedin_profile, self.posts, self.comments, self.google_news, self.publications
-            ])),
-            ("Determining engagement style", self.engagement_style_chain, lambda: self.get_context_from_sources([
-                self.posts, self.comments
-            ])),
-            ("Preparing objection handling strategies", self.objection_handling_chain, lambda: {
-                **self.get_profile_context(),
-                **self.get_company_context()
-            }),
-            ("Identifying trigger events and timing", self.trigger_events_and_timing_chain, lambda: {
-                **self.get_company_context(),
-                **self.get_context_from_sources([self.posts])
-            }),
-            ("Analyzing engagement highlights", self.engagement_highlights_chain,
-             lambda: self.get_context_from_sources([self.posts])),
-            ("Analyzing company information", self.about_company_chain, self.get_company_context),
-            ("Analyzing LinkedIn data", self.linkedin_data_chain, lambda: {
-                **self.get_profile_context(),
-                **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
-            }),
-            ("Analyzing google publications", self.publications_chain,
-             lambda: self.get_context_from_sources([self.publications])),
-            ("Analyzing google news", self.process_news_content, self.get_google_news_context),
+            (
+                "Generating opportunities", "opportunities", self.opportunities_chain,
+                lambda: {
+                    **self.get_profile_context(),
+                    **self.get_company_context()
+                }
+            ),
+            (
+                "Identifying talking points", "talking_point", self.talking_point_chain,
+                lambda: self.get_context_from_sources(
+                    [self.linkedin_profile, self.posts, self.comments, self.google_news, self.publications]
+                )
+            ),
+            (
+                "Determining engagement style", "engagement_style", self.engagement_style_chain,
+                lambda: self.get_context_from_sources(
+                    [self.posts, self.comments]
+                )
+            ),
+            (
+                "Preparing objection handling strategies", "objection_handling",  self.objection_handling_chain,
+                lambda: {
+                    **self.get_profile_context(),
+                    **self.get_company_context()
+                }
+            ),
+            (
+                "Identifying trigger events and timing", "trigger_events_and_timing", self.trigger_events_and_timing_chain,
+                lambda: {
+                    **self.get_company_context(),
+                    **self.get_context_from_sources([self.posts])
+                }
+            ),
+            (
+                "Analyzing engagement highlights", "engagement_highlights", self.engagement_highlights_chain,
+                lambda: self.get_context_from_sources([self.posts])
+            ),
+            (
+                "Analyzing company information", "about_company", self.about_company_chain, self.get_company_context
+            ),
+            (
+                "Analyzing LinkedIn data", "linkedin_data", self.linkedin_data_chain,
+                lambda: {
+                    **self.get_profile_context(),
+                    **{f"[{self.citation_list.index(company) + 1}]": company for company in self.companies}
+                }
+            ),
         ]
 
-        for label, chain_func, context_func in steps:
-            result += self.process_with_spinner(label, chain_func, context_func) + "\n\n"
+        for label, key, chain_func, context_func in steps:
+            cached_outputs[key] = self.process_with_spinner(label, chain_func, context_func)
+            result += cached_outputs[key] + "\n\n"
+
+        result += self.user_publications + self.user_google_news
 
         outreach_email_input = {
-            "opportunities": self.opportunities_chain(),
-            "talking_point": self.talking_point_chain(),
-            "engagement_highlights": self.engagement_highlights_chain(),
-            "objection_handling": self.objection_handling_chain(),
-            "trigger_events_and_timing": self.trigger_events_and_timing_chain(),
-            "engagement_style": self.engagement_style_chain(),
-            "about_company": self.about_company_chain(),
-            "linkedin_data": self.linkedin_data_chain(),
+            "opportunities": cached_outputs.get("opportunities"),
+            "talking_point": cached_outputs.get("talking_point"),
+            "engagement_highlights": cached_outputs.get("engagement_highlights"),
+            "objection_handling": cached_outputs.get("objection_handling"),
+            "trigger_events_and_timing": cached_outputs.get("trigger_events_and_timing"),
+            "engagement_style": cached_outputs.get("engagement_style"),
+            "about_company": cached_outputs.get("about_company"),
+            "linkedin_data": cached_outputs.get("linkedin_data"),
             "sell_for_education": self.knowledge_base.get("sell_for_education"),
             "sell_for_enterprise": self.knowledge_base.get("sell_for_enterprise"),
             "knowledge_insights": self.knowledge_base.get("knowledge_insights"),
@@ -490,4 +524,4 @@ class AIClient:
             None
         ) + "\n\n"
 
-        return profile_info_markdown, result
+        return result
