@@ -22,6 +22,7 @@ class State(TypedDict):
 
 class SDRAgent:
     async def _fetch_linkedin_profile(self, state: State):
+        print("fetching linkedin profile")
         try:
             with st.spinner("Fetching LinkedIn profile..."):
                 linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
@@ -36,6 +37,7 @@ class SDRAgent:
         return state
 
     async def _fetch_linkedin_company_profile(self, state: State):
+        print("fetching linkedin company profile")
         linkedin_profile = state["linkedin_profile"]
         try:
             with st.spinner("Fetching linkedin company profile..."):
@@ -53,6 +55,7 @@ class SDRAgent:
         return state
 
     async def _fetch_company_websites(self, state: State):
+        print("fetching company websites")
         company_websites = state["company_websites"]
         try:
             if company_websites:
@@ -68,6 +71,7 @@ class SDRAgent:
         return company_websites
 
     async def _fetch_google_news(self, state: State):
+        print("fetching google news")
         linkedin_profile = state["linkedin_profile"]
         try:
             with st.spinner("Fetching google news..."):
@@ -81,6 +85,7 @@ class SDRAgent:
         return state
 
     async def _fetch_google_publications(self, state: State):
+        print("fetching google publications")
         linkedin_profile = state["linkedin_profile"]
         try:
             with st.spinner("Fetching google publications..."):
@@ -96,6 +101,7 @@ class SDRAgent:
         return state
 
     async def _fetch_linkedin_posts(self, state: State):
+        print("fetching linkedin posts")
         linkedin_profile = state["linkedin_profile"]
         if linkedin_profile:
             try:
@@ -110,6 +116,7 @@ class SDRAgent:
         return state
 
     async def _fetch_linkedin_comments(self, state: State):
+        print("fetching linkedin comments")
         linkedin_profile = state["linkedin_profile"]
 
         if linkedin_profile:
