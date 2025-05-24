@@ -429,7 +429,7 @@ if st.session_state.authenticated:
 
             # Once "run_search" is True, execute the main logic
             if st.session_state.run_search and not st.session_state.search_complete:
-                graph = SDRAgent()
+                sdr_agent = SDRAgent()
 
                 async def run_async_graph():
                     result = await sdr_agent.invoke_graph(st.session_state.linkedin_url, st.session_state.email)
