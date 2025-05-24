@@ -430,9 +430,10 @@ if st.session_state.authenticated:
             if st.session_state.run_search and not st.session_state.search_complete:
                 graph = SDRAgent()
 
-                success, message = graph.invoke_graph(
-                    st.session_state.linkedin_url, st.session_state.email
-                )
+                async def run_async_graph():
+                    result = await sdr_agent.invoke_graph(st.session_state.linkedin_url, st.session_state.email)
+                    st.write(result)
+                success, message = asyncio.run(run_async_graph())
                 # success, message = process_user_details(
                 #     st.session_state.linkedin_url, st.session_state.email
                 # )

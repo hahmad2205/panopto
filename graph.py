@@ -150,12 +150,13 @@ class SDRAgent:
 
         return builder.compile()
 
-    def invoke_graph(self, linkedin_url, email):
+    async def invoke_graph(self, linkedin_url, email):
         state = {
             "linkedin_url": linkedin_url,
             "email": email,
         }
-        return self.create_graph.ainvoke(state)
+        graph = self.create_graph()
+        return await graph.ainvoke(state)
 
 
 sdr_agent = SDRAgent()
