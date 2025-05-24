@@ -2,6 +2,7 @@ import os
 import re
 
 import sentry_sdk
+import asyncio
 import streamlit as st
 from decouple import config
 from sentry_sdk.integrations.logging import LoggingIntegration
