@@ -1,6 +1,6 @@
 import os
 import re
-
+from graph_runner import run_graph_sync, INITIAL_STATE
 import sentry_sdk
 import streamlit as st
 from decouple import config
@@ -33,6 +33,7 @@ if "api_call_status" not in st.session_state:
 if "api_message" not in st.session_state:
     st.session_state.api_message = ""
 
+
 # --- Callback for starting search ---
 def start_search():
     email = st.session_state.email
@@ -51,6 +52,7 @@ def start_search():
     else:
         st.session_state.run_search = True
 
+
 # --- Reset function ---
 def reset():
     st.session_state.run_search = False
@@ -59,6 +61,7 @@ def reset():
     st.session_state.api_message = ""
     st.session_state.linkedin_url = ""
     st.session_state.email = ""
+
 
 # --- Page Config ---
 st.set_page_config(page_title="Panopto SDR Agent", layout="wide")
@@ -73,41 +76,41 @@ if st.session_state.authenticated:
                 background-color: #f8f9ff !important;  /* or any hex/color you prefer */
                 color-scheme: light !important;        /* Prevents switching to dark mode */
             }
-    
+
             .status-message {
                 margin-top: 20px;
                 padding: 10px;
                 border-radius: 5px;
                 text-align: center;
             }
-    
+
             .status-success {
                 background-color: #d4edda;
                 color: #155724;
             }
-    
+
             .status-error {
                 background-color: #f8d7da;
                 color: #721c24;
             }
-    
+
             /* Hide Streamlit elements */
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             header {visibility: hidden;}
-    
+
             /* Container styling */
             .main-container {
                 max-width: 1200px !important;
                 padding: 0 1rem !important;
                 margin: 0 auto !important;
             }
-    
+
             /* Global font styles */
             * {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             }
-    
+
             /* Form container */
             .form-container {
                 background-color: #f8f9ff;
@@ -116,7 +119,7 @@ if st.session_state.authenticated:
                 text-align: center;
                 margin-bottom: 40px;
             }
-    
+
             /* Style for Streamlit input fields */
             div[data-baseweb="input"] {
                 background-color: #f2f3f5 !important;
@@ -124,16 +127,16 @@ if st.session_state.authenticated:
                 border: none !important;
                 padding: 5px 15px !important;
             }
-    
+
             div[data-baseweb="input"] > div {
                 background-color: transparent !important;
                 border: none !important;
             }
-    
+
             div[data-baseweb="input"] input {
                 font-size: 16px !important;
             }
-    
+
             .stTextInput > div > div > input {
                 background-color: white !important;
                 border-radius: 8px !important;
@@ -150,11 +153,11 @@ if st.session_state.authenticated:
                 color: grey !important;
                 font-size: 14px !important;
             }
-            
+
             .stTextInput > div > div > * {
                 color: black !important;
             }
-    
+
             /* Button style override */
             .stButton > button {
                 width: 100%;
@@ -168,7 +171,7 @@ if st.session_state.authenticated:
                 font-size: 16px;
                 font-weight: 400;
             }
-    
+
             /* Card styling */
             .feature-card {
                 background-color: #f8f9ff;
@@ -178,7 +181,7 @@ if st.session_state.authenticated:
                 box-sizing: border-box;
                 margin-top: 20px;
             }
-    
+
             .icon-circle {
                 width: 40px;
                 height: 40px;
@@ -187,26 +190,26 @@ if st.session_state.authenticated:
                 align-items: center;
                 justify-content: center;
             }
-    
+
             /* Remove extra padding in Streamlit */
             .block-container {
                 padding: 0.5rem !important;
                 padding-bottom: 0 !important;
                 max-width: 100% !important;
             }
-    
+
             /* Remove spacing between rows */
             [data-testid="stVerticalBlock"] {
                 gap: 0 !important;
             }
-    
+
             /* Fix spacing around columns */
             [data-testid="stHorizontalBlock"] {
                 gap: 1rem !important;
             }
-    
+
             /* Custom CSS for styling */
-    
+
             /* Input field styling */
             .stTextInput > div > div > input {
                 background-color: #f2f3f5 !important;
@@ -219,7 +222,7 @@ if st.session_state.authenticated:
             .stTextInput {
                 margin-bottom: 20px !important;
             }
-            
+
             /* Label styling */
             .input-label {
                 text-align: left !important;
@@ -254,7 +257,7 @@ if st.session_state.authenticated:
                 border: none !important;
                 padding: 0 !important;
             }
-    
+
             /* Loading spinner */
             .spinner {
                 width: 40px;
@@ -265,12 +268,12 @@ if st.session_state.authenticated:
                 border-radius: 50%;
                 animation: spin 1s linear infinite;
             }
-    
+
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
-    
+
             /* Status message */
             .status-message {
                 margin-top: 10px;
@@ -279,22 +282,22 @@ if st.session_state.authenticated:
                 border-radius: 5px;
                 text-align: center;
             }
-    
+
             .status-success {
                 background-color: #d4edda;
                 color: #155724;
             }
-    
+
             .status-error {
                 background-color: #f8d7da;
                 color: #721c24;
             }
-    
+
             .status-loading {
                 background-color: #e2e6ea;
                 color: #383d41;
             }
-    
+
             .main {
                 padding: 0rem 1rem;
             }
@@ -313,7 +316,7 @@ if st.session_state.authenticated:
                 font-weight: bold;
                 margin-bottom: 10px;
             }
-            
+
             .stTextInput > div > div > input:disabled {
                 -webkit-text-fill-color: gray !important;
             }
@@ -424,9 +427,16 @@ if st.session_state.authenticated:
 
             # Once "run_search" is True, execute the main logic
             if st.session_state.run_search and not st.session_state.search_complete:
-                success, message = process_user_details(
-                    st.session_state.linkedin_url, st.session_state.email
-                )
+                initial_state = INITIAL_STATE.copy()
+                initial_state["linkedin_url"] = st.session_state.linkedin_url
+                initial_state["email"] = st.session_state.email
+
+                # Run the LangGraph (this is your new AI workflow)
+                result = run_graph_sync(initial_state)
+                #
+                # success, message = process_user_details(
+                #     st.session_state.linkedin_url, st.session_state.email
+                # )
                 st.session_state.api_call_status = success
                 st.session_state.api_message = message
                 st.session_state.search_complete = True
@@ -440,7 +450,7 @@ if st.session_state.authenticated:
                         f'<div class="status-message {status_class}">{st.session_state.api_message}</div>',
                         unsafe_allow_html=True,
                     )
-                    
+
                 st.button("🔁 Start Over", on_click=reset)
 
         # Close the gray box
@@ -712,8 +722,6 @@ elif not st.session_state.authenticated:
     """,
         unsafe_allow_html=True,
     )
-
-
 
     col1, col2 = st.columns([1, 1])
     with col1:
