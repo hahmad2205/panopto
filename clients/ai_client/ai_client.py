@@ -31,6 +31,7 @@ class AIClient:
         self.news_availability = False
         self.llm_output = {}
         self._initialize_sdr_data(linkedin_profile_id)
+        processing_spinner_style()
 
     def _initialize_sdr_data(self, linkedin_profile_id):
         profile = (

@@ -365,9 +365,10 @@ class SDRAgent:
             state["additional_outreaches"],
             state["citations"],
         ]
+        results_combined = "".join(result for result in ai_results)
 
         return {
-            "result": "".join(result for result in ai_results)
+            "result": "## Sales Insights\n" + results_combined
         }
 
     async def _create_pdf(self, state: State):
@@ -383,7 +384,7 @@ class SDRAgent:
                 st.markdown('<span style="color:black;">✅ PDF created...</span>',
                             unsafe_allow_html=True)
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ PDF creation failed...</span>',
+            st.markdown(f'<span style="color:black;">❌ PDF creation failed... {e}</span>',
                         unsafe_allow_html=True)
 
         return {
