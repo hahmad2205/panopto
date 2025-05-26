@@ -106,18 +106,8 @@ class DataClient:
 
         return linkedin_profile
 
-    def store_processed_profile(self, pdf, markdown_text, email_to):
-        self.linkedin_profile = (
-            supabase_client.table("sdr_agent_linkedinprofile")
-            .select(
-                "*"
-            )
-            .eq("id", 234)
-            .single()
-            .execute()
-        ).data
-
-        storage_path = f"{self.linkedin_profile.get('public_identifier')}_{self.linkedin_profile.get('id')}_profile.pdf"
+    def store_processed_profile(self, pdf, markdown_text, email_to, linkedin_profile):
+        storage_path = f"{linkedin_profile.get('public_identifier')}_{linkedin_profile.get('id')}_profile.pdf"
 
         supabase_client.storage.from_("processedprofiles").upload(
             file=pdf, path=storage_path, file_options={"content-type": "application/pdf"}
@@ -131,7 +121,7 @@ class DataClient:
             "text": markdown_text,
             "email_to": email_to,
             "final_pdf": final_pdf,
-            "linkedin_profile_id": self.linkedin_profile.get("id"),
+            "linkedin_profile_id": linkedin_profile.get("id"),
         }
 
         supabase_client.table("sdr_agent_processedprofile").insert(profile_data).execute()

@@ -1,8 +1,7 @@
 import os
 import re
-
-import sentry_sdk
 import asyncio
+import sentry_sdk
 import streamlit as st
 from decouple import config
 from sentry_sdk.integrations.logging import LoggingIntegration
@@ -429,12 +428,13 @@ if st.session_state.authenticated:
 
             # Once "run_search" is True, execute the main logic
             if st.session_state.run_search and not st.session_state.search_complete:
-                sdr_agent = SDRAgent()
+                graph = SDRAgent()
 
-                async def run_async_graph():
-                    result = await sdr_agent.invoke_graph(st.session_state.linkedin_url, st.session_state.email)
-                    st.write(result)
-                success, message = asyncio.run(run_async_graph())
+                graph.invoke_graph(
+                    st.session_state.linkedin_url, st.session_state.email
+                )
+                success = True
+                message = "GRAPH EXECUTING"
                 # success, message = process_user_details(
                 #     st.session_state.linkedin_url, st.session_state.email
                 # )

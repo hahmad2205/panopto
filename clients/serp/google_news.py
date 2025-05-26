@@ -24,9 +24,6 @@ class GoogleNewsClient:
                     "source_name": item.get("source", {}).get("name"),
                     "position": item.get("position"),
                     "link": item.get("link"),
-                    "thumbnail": item.get("thumbnail"),
-                    "thumbnail_small": item.get("thumbnail_small"),
-                    "source_icon": item.get("source", {}).get("icon"),
                     "linkedin_profile_id": self.linkedin_profile_id,
                 }
             )
@@ -35,6 +32,8 @@ class GoogleNewsClient:
     def store_persons_news(self):
         google_news = call_api("get", self.base_url, {}, params=self.params)
         parsed_news = self._parse_news(google_news)
-
+        response = []
         if parsed_news:
-            supabase_client.table("sdr_agent_googlenews").insert(parsed_news).execute()
+            response = supabase_client.table("sdr_agent_googlenews").insert(parsed_news).execute()
+
+        return response.data if response else None

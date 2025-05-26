@@ -42,6 +42,9 @@ class LinkedinCommentsActor:
         run = self.client.actor(config("LINKEDIN_COMMENTS_ACTOR_ID")).call(run_input=self.run_input)
         linkedin_comments_iter = self.client.dataset(run["defaultDatasetId"]).iterate_items()
         parsed_linkedin_comments = self._parse_linkedin_comments(linkedin_comments_iter)
+        response = []
 
         if parsed_linkedin_comments:
-            supabase_client.table("sdr_agent_linkedincomment").insert(parsed_linkedin_comments).execute()
+            response = supabase_client.table("sdr_agent_linkedincomment").insert(parsed_linkedin_comments).execute()
+
+        return response.data if response else None

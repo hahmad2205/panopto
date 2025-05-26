@@ -60,10 +60,8 @@ class LinkedinCompanyProfileClient:
 
         if company_records:
             response = supabase_client.table("sdr_agent_companylinkedinprofile").insert(company_records).execute()
-            if response.data:
-                self.saved_profiles = response.data
-            else:
-                print("Failed to insert company records:")
+            self.saved_profiles = response.data
+            return self.saved_profiles
 
     def get_company_websites(self):
         return [

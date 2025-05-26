@@ -71,6 +71,8 @@ class GoogleScholarsClient:
         }
         scholar_articles = call_api("get", self.base_url, {}, params=google_articles_params)
         parsed_articles = self._parse_scholar_articles_data(scholar_articles)
-
+        response = []
         if parsed_articles:
-            supabase_client.table("sdr_agent_googlepublication").insert(parsed_articles).execute()
+            response = supabase_client.table("sdr_agent_googlepublication").insert(parsed_articles).execute()
+
+        return response.data if response else None
