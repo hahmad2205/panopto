@@ -347,8 +347,7 @@ class SDRAgent:
 
     async def _aggregate_ai_result(self, state: State):
         ai_client = state["ai_client"]
-        state["profile_info_markdown"] = ai_client.create_profile_header_markdown(state["linkedin_url"])
-        state["result"] = "## Sales Insights\n"
+        profile_info_markdown = ai_client.create_profile_header_markdown(state["linkedin_url"])
 
         ai_results = [
             state["opportunities"],
@@ -368,6 +367,7 @@ class SDRAgent:
         results_combined = "".join(result for result in ai_results)
 
         return {
+            "profile_info_markdown": profile_info_markdown,
             "result": "## Sales Insights\n" + results_combined
         }
 
