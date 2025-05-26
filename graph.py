@@ -55,10 +55,12 @@ class SDRAgent:
         profile = {}
 
         try:
-            linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
-            profile = linkedin_profile_client.store_linkedin_profile()
+            with st.spinner("Fetching LinkedIn profile..."):
+                linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
+                profile = linkedin_profile_client.store_linkedin_profile()
+                st.markdown('<span style="color:black;">✅ LinkedIn profile fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
-            print(e)
+            st.markdown('<span style="color:black;">❌ LinkedIn profile fetching failed...</span>', unsafe_allow_html=True)
 
         user_recent_company_linkedin_profile_urls = linkedin_profile_client.get_recent_experience()
 
@@ -73,23 +75,28 @@ class SDRAgent:
         company_websites = []
 
         try:
-            linkedin_company_profile_client = LinkedinCompanyProfileClient(
-                state["user_recent_company_linkedin_profile_urls"], linkedin_profile.get("id")
-            )
-            if state["user_recent_company_linkedin_profile_urls"]:
-                linkedin_company_profiles = linkedin_company_profile_client.store_company_linkedin_profiles()
+            with st.spinner("Fetching linkedin company profile..."):
+                linkedin_company_profile_client = LinkedinCompanyProfileClient(
+                    state["user_recent_company_linkedin_profile_urls"], linkedin_profile.get("id")
+                )
+                if state["user_recent_company_linkedin_profile_urls"]:
+                    linkedin_company_profiles = linkedin_company_profile_client.store_company_linkedin_profiles()
+            st.markdown('<span style="color:black;">✅ Linkedin company profile fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
-            print(e)
+            st.markdown('<span style="color:black;">❌ Linkedin company profile fetching failed...</span>', unsafe_allow_html=True)
 
         company_websites_url = linkedin_company_profile_client.get_company_websites()
 
         try:
             if company_websites:
-                for company_website_url in company_websites_url:
-                    website_crawler = WebsiteCrawlActor(company_website_url)
-                    company_websites = website_crawler.store_company_website()
+                with st.spinner("Fetching company websites..."):
+                    for company_website_url in company_websites_url:
+                        website_crawler = WebsiteCrawlActor(company_website_url)
+                        company_websites = website_crawler.store_company_website()
+                st.markdown('<span style="color:black;">✅ Company websites fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
-            print(e)
+            st.markdown('<span style="color:black;">❌ Company websites fetching failed...</span>',
+                        unsafe_allow_html=True)
 
         return {
             "linkedin_company_profiles": linkedin_company_profiles,
@@ -101,10 +108,13 @@ class SDRAgent:
         linkedin_profile = state["linkedin_profile"]
         google_news = []
         try:
-            google_news_client = GoogleNewsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
-            google_news = google_news_client.store_persons_news()
+            with st.spinner("Fetching google news..."):
+                google_news_client = GoogleNewsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
+                google_news = google_news_client.store_persons_news()
+            st.markdown('<span style="color:black;">✅ Google news fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
-            print(e)
+            st.markdown('<span style="color:black;">❌ Google news fetching failed...</span>',
+                        unsafe_allow_html=True)
 
         return {
             "google_news": google_news
@@ -114,12 +124,15 @@ class SDRAgent:
         linkedin_profile = state["linkedin_profile"]
         google_publications = []
         try:
-            google_scholar_client = GoogleScholarsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
-            google_scholar_author_id = google_scholar_client.store_scholar_profile()
-            if google_scholar_author_id:
-                google_publications = google_scholar_client.store_scholar_articles(google_scholar_author_id)
+            with st.spinner("Fetching google publications..."):
+                google_scholar_client = GoogleScholarsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
+                google_scholar_author_id = google_scholar_client.store_scholar_profile()
+                if google_scholar_author_id:
+                    google_publications = google_scholar_client.store_scholar_articles(google_scholar_author_id)
+            st.markdown('<span style="color:black;">✅ Google publications fetched...</span>', unsafe_allow_html=True)
         except Exception as e:
-            print(e)
+            st.markdown('<span style="color:black;">❌ Google publications fetching failed...</span>',
+                        unsafe_allow_html=True)
 
         return {
             "google_publications": google_publications
@@ -130,10 +143,13 @@ class SDRAgent:
         linkedin_posts = []
         if linkedin_profile:
             try:
-                linkedin_post_actor = LinkedinPostActor(state["linkedin_url"], linkedin_profile.get("id"))
-                linkedin_posts = linkedin_post_actor.store_linkedin_posts()
+                with st.spinner("Fetching linkedin posts..."):
+                    linkedin_post_actor = LinkedinPostActor(state["linkedin_url"], linkedin_profile.get("id"))
+                    linkedin_posts = linkedin_post_actor.store_linkedin_posts()
+                st.markdown('<span style="color:black;">✅ Linkedin posts fetched...</span>', unsafe_allow_html=True)
             except Exception as e:
-                print(e)
+                st.markdown('<span style="color:black;">❌ Linkedin posts fetching failed...</span>',
+                            unsafe_allow_html=True)
 
         return {
             "linkedin_posts": linkedin_posts
@@ -145,10 +161,13 @@ class SDRAgent:
 
         if linkedin_profile:
             try:
-                linkedin_comments_actor = LinkedinCommentsActor(state["linkedin_url"], linkedin_profile.get("id"))
-                linkedin_comments = linkedin_comments_actor.store_linkedin_comments()
+                with st.spinner("Fetching linkedin comments..."):
+                    linkedin_comments_actor = LinkedinCommentsActor(state["linkedin_url"], linkedin_profile.get("id"))
+                    linkedin_comments = linkedin_comments_actor.store_linkedin_comments()
+                st.markdown('<span style="color:black;">✅ Linkedin comments fetched...</span>', unsafe_allow_html=True)
             except Exception as e:
-                print(e)
+                st.markdown('<span style="color:black;">❌ Linkedin comments fetching failed...</span>',
+                            unsafe_allow_html=True)
 
         return {
             "linkedin_comments": linkedin_comments
@@ -437,13 +456,6 @@ class SDRAgent:
 
         # Add edges
         builder.add_edge(START, "fetch_linkedin_profile")
-        builder.add_edge("fetch_linkedin_profile", "fetch_linkedin_company_profile")
-        builder.add_edge("fetch_linkedin_profile", "fetch_linkedin_posts")
-        builder.add_edge("fetch_linkedin_profile", "fetch_linkedin_comments")
-        builder.add_edge("fetch_linkedin_profile", "fetch_google_news")
-        builder.add_edge("fetch_linkedin_profile", "fetch_google_publications")
-
-
         self._add_edges_from_combinations(
             builder,
             ["fetch_linkedin_profile"],

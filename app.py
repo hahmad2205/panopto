@@ -1,13 +1,12 @@
 import os
 import re
-import asyncio
+
 import sentry_sdk
 import streamlit as st
 from decouple import config
 from sentry_sdk.integrations.logging import LoggingIntegration
 
 from graph import SDRAgent
-from tasks import process_user_details
 
 SENTRY_DSN = config('SENTRY_DSN')
 
@@ -430,14 +429,9 @@ if st.session_state.authenticated:
             if st.session_state.run_search and not st.session_state.search_complete:
                 graph = SDRAgent()
 
-                graph.invoke_graph(
+                success, message = graph.invoke_graph(
                     st.session_state.linkedin_url, st.session_state.email
                 )
-                success = True
-                message = "GRAPH EXECUTING"
-                # success, message = process_user_details(
-                #     st.session_state.linkedin_url, st.session_state.email
-                # )
                 st.session_state.api_call_status = success
                 st.session_state.api_message = message
                 st.session_state.search_complete = True
