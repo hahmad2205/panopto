@@ -51,16 +51,14 @@ class State(TypedDict):
     storage_path: str
 
 class SDRAgent:
-    async def _fetch_linkedin_profile(self, state: State):
+    def _fetch_linkedin_profile(self, state: State):
         profile = {}
 
         try:
-            with st.spinner("Fetching LinkedIn profile..."):
-                linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
-                profile = linkedin_profile_client.store_linkedin_profile()  # Await if async
-            st.markdown('<span style="color:black;">✅ LinkedIn profile fetched...</span>', unsafe_allow_html=True)
+            linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
+            profile = linkedin_profile_client.store_linkedin_profile()
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ LinkedIn profile fetching failed...</span>', unsafe_allow_html=True)
+            print(e)
 
         user_recent_company_linkedin_profile_urls = linkedin_profile_client.get_recent_experience()
 
@@ -69,34 +67,29 @@ class SDRAgent:
             "user_recent_company_linkedin_profile_urls": user_recent_company_linkedin_profile_urls
         }
 
-    async def _fetch_linkedin_company_profile(self, state: State):
+    def _fetch_linkedin_company_profile(self, state: State):
         linkedin_profile = state["linkedin_profile"]
         linkedin_company_profiles = []
         company_websites = []
 
         try:
-            with st.spinner("Fetching linkedin company profile..."):
-                linkedin_company_profile_client = LinkedinCompanyProfileClient(
-                    state["user_recent_company_linkedin_profile_urls"], linkedin_profile.get("id")
-                )
-                if state["user_recent_company_linkedin_profile_urls"]:
-                    linkedin_company_profiles = linkedin_company_profile_client.store_company_linkedin_profiles()
-            st.markdown('<span style="color:black;">✅ Linkedin company profile fetched...</span>', unsafe_allow_html=True)
+            linkedin_company_profile_client = LinkedinCompanyProfileClient(
+                state["user_recent_company_linkedin_profile_urls"], linkedin_profile.get("id")
+            )
+            if state["user_recent_company_linkedin_profile_urls"]:
+                linkedin_company_profiles = linkedin_company_profile_client.store_company_linkedin_profiles()
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Linkedin company profile fetching failed...</span>', unsafe_allow_html=True)
+            print(e)
 
         company_websites_url = linkedin_company_profile_client.get_company_websites()
 
         try:
             if company_websites:
-                with st.spinner("Fetching company websites..."):
-                    for company_website_url in company_websites_url:
-                        website_crawler = WebsiteCrawlActor(company_website_url)
-                        company_websites = website_crawler.store_company_website()
-                st.markdown('<span style="color:black;">✅ Company websites fetched...</span>', unsafe_allow_html=True)
+                for company_website_url in company_websites_url:
+                    website_crawler = WebsiteCrawlActor(company_website_url)
+                    company_websites = website_crawler.store_company_website()
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Company websites fetching failed...</span>',
-                        unsafe_allow_html=True)
+            print(e)
 
         return {
             "linkedin_company_profiles": linkedin_company_profiles,
@@ -104,83 +97,71 @@ class SDRAgent:
             "company_websites": company_websites
         }
 
-    async def _fetch_google_news(self, state: State):
+    def _fetch_google_news(self, state: State):
         linkedin_profile = state["linkedin_profile"]
         google_news = []
         try:
-            with st.spinner("Fetching google news..."):
-                google_news_client = GoogleNewsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
-                google_news = google_news_client.store_persons_news()
-            st.markdown('<span style="color:black;">✅ Google news fetched...</span>', unsafe_allow_html=True)
+            google_news_client = GoogleNewsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
+            google_news = google_news_client.store_persons_news()
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Google news fetching failed...</span>',
-                        unsafe_allow_html=True)
+            print(e)
 
         return {
             "google_news": google_news
         }
 
-    async def _fetch_google_publications(self, state: State):
+    def _fetch_google_publications(self, state: State):
         linkedin_profile = state["linkedin_profile"]
         google_publications = []
         try:
-            with st.spinner("Fetching google publications..."):
-                google_scholar_client = GoogleScholarsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
-                google_scholar_author_id = google_scholar_client.store_scholar_profile()
-                if google_scholar_author_id:
-                    google_publications = google_scholar_client.store_scholar_articles(google_scholar_author_id)
-            st.markdown('<span style="color:black;">✅ Google publications fetched...</span>', unsafe_allow_html=True)
+            google_scholar_client = GoogleScholarsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
+            google_scholar_author_id = google_scholar_client.store_scholar_profile()
+            if google_scholar_author_id:
+                google_publications = google_scholar_client.store_scholar_articles(google_scholar_author_id)
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Google publications fetching failed...</span>',
-                        unsafe_allow_html=True)
+            print(e)
 
         return {
             "google_publications": google_publications
         }
 
-    async def _fetch_linkedin_posts(self, state: State):
+    def _fetch_linkedin_posts(self, state: State):
         linkedin_profile = state["linkedin_profile"]
         linkedin_posts = []
         if linkedin_profile:
             try:
-                with st.spinner("Fetching linkedin posts..."):
-                    linkedin_post_actor = LinkedinPostActor(state["linkedin_url"], linkedin_profile.get("id"))
-                    linkedin_posts = linkedin_post_actor.store_linkedin_posts()
-                st.markdown('<span style="color:black;">✅ Linkedin posts fetched...</span>', unsafe_allow_html=True)
+                linkedin_post_actor = LinkedinPostActor(state["linkedin_url"], linkedin_profile.get("id"))
+                linkedin_posts = linkedin_post_actor.store_linkedin_posts()
             except Exception as e:
-                st.markdown('<span style="color:black;">❌ Linkedin posts fetching failed...</span>',
-                            unsafe_allow_html=True)
+                print(e)
 
         return {
             "linkedin_posts": linkedin_posts
         }
 
-    async def _fetch_linkedin_comments(self, state: State):
+    def _fetch_linkedin_comments(self, state: State):
         linkedin_profile = state["linkedin_profile"]
         linkedin_comments = []
 
         if linkedin_profile:
             try:
-                with st.spinner("Fetching linkedin comments..."):
-                    linkedin_comments_actor = LinkedinCommentsActor(state["linkedin_url"], linkedin_profile.get("id"))
-                    linkedin_comments = linkedin_comments_actor.store_linkedin_comments()
-                st.markdown('<span style="color:black;">✅ Linkedin comments fetched...</span>', unsafe_allow_html=True)
+                linkedin_comments_actor = LinkedinCommentsActor(state["linkedin_url"], linkedin_profile.get("id"))
+                linkedin_comments = linkedin_comments_actor.store_linkedin_comments()
             except Exception as e:
-                st.markdown('<span style="color:black;">❌ Linkedin comments fetching failed...</span>',
-                            unsafe_allow_html=True)
+                print(e)
 
         return {
             "linkedin_comments": linkedin_comments
         }
 
-    async def _initialize_ai_client(self, state: State):
+    def _initialize_ai_client(self, state: State):
         linkedin_profile = state["linkedin_profile"]
 
         return {
             "ai_client": AIClient(linkedin_profile.get("id"))
         }
 
-    async def _process_google_news(self, state: State):
+    def _process_google_news(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -191,7 +172,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_google_publications(self, state: State):
+    def _process_google_publications(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -202,7 +183,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_opportunities(self, state: State):
+    def _process_opportunities(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -216,7 +197,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_talking_points(self, state: State):
+    def _process_talking_points(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -229,7 +210,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_engagement_style(self, state: State):
+    def _process_engagement_style(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -242,7 +223,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_objection_handling(self, state: State):
+    def _process_objection_handling(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -256,7 +237,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_trigger_events_and_timing(self, state: State):
+    def _process_trigger_events_and_timing(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -270,7 +251,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_engagement_highlights(self, state: State):
+    def _process_engagement_highlights(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -281,7 +262,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_company_information(self, state: State):
+    def _process_company_information(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -292,7 +273,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_linkedin_data(self, state: State):
+    def _process_linkedin_data(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -306,7 +287,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_outreach_email(self, state: State):
+    def _process_outreach_email(self, state: State):
         ai_client = state["ai_client"]
         llm_output = {
             "opportunities": state["opportunities"],
@@ -323,7 +304,7 @@ class SDRAgent:
             "outreach_email": ai_client.create_additional_outreach_email(llm_output)
         }
 
-    async def _process_additional_outreaches(self, state: State):
+    def _process_additional_outreaches(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -334,7 +315,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _process_citations(self, state: State):
+    def _process_citations(self, state: State):
         ai_client = state["ai_client"]
 
         return {
@@ -345,7 +326,7 @@ class SDRAgent:
             ) + "\n\n"
         }
 
-    async def _aggregate_ai_result(self, state: State):
+    def _aggregate_ai_result(self, state: State):
         ai_client = state["ai_client"]
         profile_info_markdown = ai_client.create_profile_header_markdown(state["linkedin_url"])
 
@@ -371,7 +352,7 @@ class SDRAgent:
             "result": "## Sales Insights\n" + results_combined
         }
 
-    async def _create_pdf(self, state: State):
+    def _create_pdf(self, state: State):
         data_client = DataClient()
         pdf = ""
         final_pdf = ""
@@ -384,7 +365,7 @@ class SDRAgent:
                 st.markdown('<span style="color:black;">✅ PDF created...</span>',
                             unsafe_allow_html=True)
         except Exception as e:
-            st.markdown(f'<span style="color:black;">❌ PDF creation failed... {e}</span>',
+            st.markdown('<span style="color:black;">❌ PDF creation failed...</span>',
                         unsafe_allow_html=True)
 
         return {
@@ -393,7 +374,7 @@ class SDRAgent:
             "storage_path": storage_path
         }
 
-    async def send_email(self, state: State):
+    def _send_email(self, state: State):
         try:
             with st.spinner("Sending email..."):
                 email_client = EmailClient()
@@ -413,75 +394,116 @@ class SDRAgent:
 
         return state
 
+    def _add_nodes_from_dict(self, builder, nodes: dict):
+        for label, function in nodes.items():
+            builder.add_node(label, function)
+
+    def _add_edges_from_combinations(self, builder, start_keys, end_keys):
+        for start in start_keys:
+            for end in end_keys:
+                builder.add_edge(start, end)
+
     def create_graph(self):
         builder = StateGraph(State)
 
-        # Add node
-        builder.add_node("fetch_linkedin_profile", self._fetch_linkedin_profile)
-        builder.add_node("fetch_linkedin_company_profile", self._fetch_linkedin_company_profile)
-        builder.add_node("fetch_linkedin_posts", self._fetch_linkedin_posts)
-        builder.add_node("fetch_linkedin_comments", self._fetch_linkedin_comments)
-        builder.add_node("fetch_google_news", self._fetch_google_news)
-        builder.add_node("fetch_google_publications", self._fetch_google_publications)
+        nodes = {
+            "fetch_linkedin_profile": self._fetch_linkedin_profile,
+            "fetch_linkedin_company_profile": self._fetch_linkedin_company_profile,
+            "fetch_linkedin_posts": self._fetch_linkedin_posts,
+            "fetch_linkedin_comments": self._fetch_linkedin_comments,
+            "fetch_google_news": self._fetch_google_news,
+            "fetch_google_publications": self._fetch_google_publications,
+            "initialize_ai_client": self._initialize_ai_client,
+            "process_google_news": self._process_google_news,
+            "process_google_publications": self._process_google_publications,
+            "process_opportunities": self._process_opportunities,
+            "process_talking_points": self._process_talking_points,
+            "process_engagement_style": self._process_engagement_style,
+            "process_objection_handling": self._process_objection_handling,
+            "process_engagement_highlights": self._process_engagement_highlights,
+            "process_trigger_events_and_timing": self._process_trigger_events_and_timing,
+            "process_company_information": self._process_company_information,
+            "process_linkedin_data": self._process_linkedin_data,
+            "process_outreach_email": self._process_outreach_email,
+            "process_additional_outreaches": self._process_additional_outreaches,
+            "process_citations": self._process_citations,
+            "aggregate_ai_result": self._aggregate_ai_result,
+            "create_pdf": self._create_pdf,
+            "send_email": self._send_email,
+        }
 
-        builder.add_node("initialize_ai_client", self._initialize_ai_client)
-        builder.add_node("process_google_news", self._process_google_news)
-        builder.add_node("process_google_publications", self._process_google_publications)
-        builder.add_node("process_opportunities", self._process_opportunities)
-        builder.add_node("process_talking_points", self._process_talking_points)
-        builder.add_node("process_engagement_style", self._process_engagement_style)
-        builder.add_node("process_objection_handling", self._process_objection_handling)
-        builder.add_node("process_engagement_highlights", self._process_engagement_highlights)
-        builder.add_node("process_trigger_events_and_timing", self._process_trigger_events_and_timing)
-        builder.add_node("process_company_information", self._process_company_information)
-        builder.add_node("process_linkedin_data", self._process_linkedin_data)
-        builder.add_node("process_outreach_email", self._process_outreach_email)
-        builder.add_node("process_additional_outreaches", self._process_additional_outreaches)
-        builder.add_node("process_citations", self._process_citations)
-        builder.add_node("aggregate_ai_result", self._aggregate_ai_result)
-        builder.add_node("create_pdf", self._create_pdf)
-        builder.add_node("send_email", self.send_email)
+        # Add nodes from the dictionary
+        self._add_nodes_from_dict(builder, nodes)
 
         # Add edges
         builder.add_edge(START, "fetch_linkedin_profile")
-
         builder.add_edge("fetch_linkedin_profile", "fetch_linkedin_company_profile")
-
         builder.add_edge("fetch_linkedin_profile", "fetch_linkedin_posts")
         builder.add_edge("fetch_linkedin_profile", "fetch_linkedin_comments")
         builder.add_edge("fetch_linkedin_profile", "fetch_google_news")
         builder.add_edge("fetch_linkedin_profile", "fetch_google_publications")
 
-        builder.add_edge("fetch_linkedin_company_profile", "initialize_ai_client")
-        builder.add_edge("fetch_linkedin_posts", "initialize_ai_client")
-        builder.add_edge("fetch_linkedin_comments", "initialize_ai_client")
-        builder.add_edge("fetch_google_news", "initialize_ai_client")
-        builder.add_edge("fetch_google_publications", "initialize_ai_client")
 
-        builder.add_edge("initialize_ai_client", "process_google_news")
-        builder.add_edge("initialize_ai_client", "process_google_publications")
-        builder.add_edge("initialize_ai_client", "process_opportunities")
-        builder.add_edge("initialize_ai_client", "process_engagement_style")
-        builder.add_edge("initialize_ai_client", "process_objection_handling")
-        builder.add_edge("initialize_ai_client", "process_trigger_events_and_timing")
-        builder.add_edge("initialize_ai_client", "process_engagement_highlights")
-        builder.add_edge("initialize_ai_client", "process_company_information")
-        builder.add_edge("initialize_ai_client", "process_linkedin_data")
-        builder.add_edge("initialize_ai_client", "process_additional_outreaches")
-        builder.add_edge("initialize_ai_client", "process_citations")
+        self._add_edges_from_combinations(
+            builder,
+            ["fetch_linkedin_profile"],
+            [
+                "fetch_linkedin_company_profile",
+                "fetch_linkedin_posts",
+                "fetch_linkedin_comments",
+                "fetch_google_news",
+                "fetch_google_publications"
+            ]
+        )
 
-        builder.add_edge("process_google_news", "process_talking_points")
-        builder.add_edge("process_google_publications", "process_talking_points")
-        builder.add_edge("process_opportunities", "process_talking_points")
-        builder.add_edge("process_engagement_style", "process_talking_points")
-        builder.add_edge("process_objection_handling", "process_talking_points")
-        builder.add_edge("process_trigger_events_and_timing", "process_talking_points")
-        builder.add_edge("process_engagement_highlights", "process_talking_points")
-        builder.add_edge("process_company_information", "process_talking_points")
-        builder.add_edge("process_linkedin_data", "process_talking_points")
+        self._add_edges_from_combinations(
+            builder,
+            [
+                "fetch_linkedin_company_profile",
+                "fetch_linkedin_posts",
+                "fetch_linkedin_comments",
+                "fetch_google_news",
+                "fetch_google_publications"
+            ],
+            ["initialize_ai_client"]
+        )
+
+        self._add_edges_from_combinations(
+            builder,
+            ["initialize_ai_client"],
+            [
+                "process_google_news",
+                "process_google_publications",
+                "process_opportunities",
+                "process_engagement_style",
+                "process_objection_handling",
+                "process_trigger_events_and_timing",
+                "process_engagement_highlights",
+                "process_company_information",
+                "process_linkedin_data",
+                "process_additional_outreaches",
+                "process_citations"
+            ]
+        )
+        self._add_edges_from_combinations(
+            builder,
+            [
+                "process_google_news",
+                "process_google_publications",
+                "process_opportunities",
+                "process_engagement_style",
+                "process_objection_handling",
+                "process_trigger_events_and_timing",
+                "process_engagement_highlights",
+                "process_company_information",
+                "process_linkedin_data",
+                "process_additional_outreaches",
+                "process_citations"
+            ],
+            ["process_talking_points"]
+        )
 
         builder.add_edge("process_talking_points", "process_outreach_email")
-
         builder.add_edge("process_outreach_email", "aggregate_ai_result")
         builder.add_edge("aggregate_ai_result", "create_pdf")
         builder.add_edge("create_pdf", "send_email")
@@ -490,12 +512,14 @@ class SDRAgent:
         return builder.compile()
 
     def invoke_graph(self, linkedin_url: str, email: str):
-        graph = self.create_graph()
+        try:
+            graph = self.create_graph()
+            initial_state = {
+                "linkedin_url": linkedin_url,
+                "email": email,
+            }
+            graph.invoke(initial_state)
 
-        initial_state = {
-            "linkedin_url": linkedin_url,
-            "email": email
-        }
-
-        import asyncio
-        asyncio.run(graph.ainvoke(initial_state))
+            return [200, f"Email sent to {email}"]
+        except Exception as e:
+            return [None, f"Processing failed: {str(e)}"]
