@@ -29,6 +29,7 @@ class WebsiteCrawlActor:
         return content
 
     def store_company_website(self):
+        websites = []
         try:
             run = self.client.actor(config("WEBSITE_CRAWLER_ACTOR_ID")).call(run_input=self.run_input)
             iterator = self.client.dataset(run["defaultDatasetId"]).iterate_items()
@@ -46,9 +47,9 @@ class WebsiteCrawlActor:
 
             if company_websites:
                 response = supabase_client.table("sdr_agent_companywebsite").insert(company_websites).execute()
-                return response.data
+                websites = response.data
 
         except Exception as e:
             print("Error in WebsiteCrawlActor:", e)
 
-        return []
+        return websites

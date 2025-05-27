@@ -1,8 +1,5 @@
-from typing import Optional
-
 import streamlit as st
 from langgraph.graph import StateGraph, START, END
-from typing_extensions import TypedDict
 
 from clients.ai_client.ai_client import AIClient
 from clients.apify.linkedin_comments_actor import LinkedinCommentsActor
@@ -14,64 +11,46 @@ from clients.proxy_curl.linkedin_company_profile import LinkedinCompanyProfileCl
 from clients.proxy_curl.linkedin_profile import LinkedinProfileClient
 from clients.serp.google_news import GoogleNewsClient
 from clients.serp.google_scholars import GoogleScholarsClient
+from state import State
 from utils import markdown_to_pdf
 
 
-class State(TypedDict):
-    linkedin_url: str
-    linkedin_profile: dict
-    user_recent_company_linkedin_profile_urls: list
-    company_websites_url: list
-    linkedin_company_profiles: list
-    company_websites: list
-    google_news: list
-    google_publications: list
-    linkedin_posts: list
-    linkedin_comments: list
-    knowledge_base: dict
-    ai_client: Optional[AIClient]
-    user_google_news: str
-    user_publications: str
-    opportunities: str
-    talking_points: str
-    engagement_style: str
-    objection_handling: str
-    trigger_events_and_timing: str
-    engagement_highlights: str
-    company_information: str
-    linkedin_data: str
-    outreach_email: str
-    additional_outreaches: str
-    citations: str
-    email: str
-    result: str
-    profile_info_markdown: str
-    pdf: str
-    final_pdf: str
-    storage_path: str
-
-
 class SDRAgent:
+    """
+    SDRAgent automates sales prospecting by gathering and analyzing data from sources like
+    LinkedIn, Google News, and Google Scholar. It uses LangGraph to manage a multi-step workflow
+     that generates insights and sends personalized outreach emails.
+    """
+
     def __init__(self, progress_callback=None):
+        """
+        Initialize the SDRAgent with an optional progress callback.
+        """
         self.progress_callback = progress_callback
 
     def show_spinner_message(self, message):
-        """Show spinner message - uses callback if available, otherwise Streamlit directly"""
+        """
+        Display a spinner message to indicate ongoing processing.
+        """
         if self.progress_callback:
             self.progress_callback('spinner', message)
         else:
             return st.spinner(message)
 
     def show_status_message(self, message, status='success'):
-        """Show status message - uses callback if available, otherwise Streamlit directly"""
+        """
+        Display a status message with appropriate styling.
+        """
         if self.progress_callback:
             self.progress_callback('status', {'message': message, 'status': status})
         else:
             color = "black" if status == 'success' else "red"
             st.markdown(f'<span style="color:{color};">{message}</span>', unsafe_allow_html=True)
 
-    # All the SDRAgent methods with modified UI calls
     def _fetch_linkedin_profile(self, state):
+        """
+        This method fetches the LinkedIn profile and recent company URLs for a prospect.
+        """
         profile = {}
         try:
             self.show_spinner_message("Fetching linkedIn profile...")
@@ -89,6 +68,9 @@ class SDRAgent:
         }
 
     def _fetch_linkedin_company_profile(self, state):
+        """
+        This method fetches 2 latest LinkedIn profiles and websites of companies the prospect is working for.
+        """
         linkedin_profile = state["linkedin_profile"]
         linkedin_company_profiles = []
         company_websites = []
@@ -112,7 +94,7 @@ class SDRAgent:
 
                 for company_website_url in company_websites_url:
                     website_crawler = WebsiteCrawlActor(company_website_url)
-                    company_websites = website_crawler.store_company_website()
+                    company_websites.append(website_crawler.store_company_website())
                 self.show_status_message("✅ Company websites fetched...", 'success')
         except Exception as e:
             self.show_status_message("❌ Company websites fetching failed...", 'error')
@@ -124,6 +106,9 @@ class SDRAgent:
         }
 
     def _fetch_google_news(self, state):
+        """
+        This method fetches recent Google News articles mentioning the prospect by name.
+        """
         linkedin_profile = state["linkedin_profile"]
         google_news = []
         try:
@@ -137,6 +122,9 @@ class SDRAgent:
         return {"google_news": google_news}
 
     def _fetch_google_publications(self, state):
+        """
+        This method fetches academic publications authored by the prospect from Google Scholar.
+        """
         linkedin_profile = state["linkedin_profile"]
         google_publications = []
         try:
@@ -152,6 +140,9 @@ class SDRAgent:
         return {"google_publications": google_publications}
 
     def _fetch_linkedin_posts(self, state):
+        """
+        This method fetches recent LinkedIn posts by the prospect.
+        """
         linkedin_profile = state["linkedin_profile"]
         linkedin_posts = []
         if linkedin_profile:
@@ -166,6 +157,9 @@ class SDRAgent:
         return {"linkedin_posts": linkedin_posts}
 
     def _fetch_linkedin_comments(self, state):
+        """
+        This method fetches the prospect's LinkedIn comments on other posts.
+        """
         linkedin_profile = state["linkedin_profile"]
         linkedin_comments = []
 
@@ -185,6 +179,9 @@ class SDRAgent:
         return {"ai_client": AIClient(linkedin_profile.get("id"))}
 
     def _process_google_news(self, state):
+        """
+        This method processes and analyze Google News data.
+        """
         ai_client = state["ai_client"]
         return {
             "user_google_news": ai_client.process_with_spinner(
@@ -194,10 +191,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_google_publications(self, state):
+        """
+        This method processes and analyze academic publications.
+        """
         ai_client = state["ai_client"]
         return {
             "user_publications": ai_client.process_with_spinner(
@@ -207,10 +207,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_opportunities(self, state):
+        """
+        This method generates sales opportunities using AI analysis.
+        """
         ai_client = state["ai_client"]
         return {
             "opportunities": ai_client.process_with_spinner(
@@ -223,10 +226,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_talking_points(self, state):
+        """
+        This method generates conversation talking points.
+        """
         ai_client = state["ai_client"]
         return {
             "talking_points": ai_client.process_with_spinner(
@@ -239,10 +245,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_engagement_style(self, state):
+        """
+        This method analyzes and determine the prospect's engagement style.
+        """
         ai_client = state["ai_client"]
         return {
             "engagement_style": ai_client.process_with_spinner(
@@ -252,10 +261,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_objection_handling(self, state):
+        """
+        This method generates objection handling strategies.
+        """
         ai_client = state["ai_client"]
         return {
             "objection_handling": ai_client.process_with_spinner(
@@ -268,10 +280,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_trigger_events_and_timing(self, state):
+        """
+        This method identifies trigger events and optimal timing for outreach.
+        """
         ai_client = state["ai_client"]
         return {
             "trigger_events_and_timing": ai_client.process_with_spinner(
@@ -284,10 +299,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_engagement_highlights(self, state):
+        """
+        This method analyzes engagement highlights from prospect's social activity.
+        """
         ai_client = state["ai_client"]
         return {
             "engagement_highlights": ai_client.process_with_spinner(
@@ -297,10 +315,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_company_information(self, state):
+        """
+        This method processes and analyze company information.
+        """
         ai_client = state["ai_client"]
         return {
             "company_information": ai_client.process_with_spinner(
@@ -310,10 +331,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_linkedin_data(self, state):
+        """
+        This method processes and analyze LinkedIn profile data.
+        """
         ai_client = state["ai_client"]
         return {
             "linkedin_data": ai_client.process_with_spinner(
@@ -326,10 +350,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_outreach_email(self, state):
+        """
+        This method generates personalized outreach email.
+        """
         ai_client = state["ai_client"]
         llm_output = {
             "opportunities": state["opportunities"],
@@ -349,6 +376,9 @@ class SDRAgent:
         )}
 
     def _process_additional_outreaches(self, state):
+        """
+        This method generate additional outreach suggestions.
+        """
         ai_client = state["ai_client"]
         return {
             "additional_outreaches": ai_client.process_with_spinner(
@@ -358,10 +388,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _process_citations(self, state):
+        """
+        This method generates citations for all data sources used in the analysis.
+        """
         ai_client = state["ai_client"]
         return {
             "citations": ai_client.process_with_spinner(
@@ -371,10 +404,13 @@ class SDRAgent:
                 self.progress_callback,
                 self.show_spinner_message,
                 self.show_status_message
-            ) + "\n\n"
+            )
         }
 
     def _aggregate_ai_result(self, state):
+        """
+        This method aggregates all AI processing results into a final report.
+        """
         ai_client = state["ai_client"]
         profile_info_markdown = ai_client.create_profile_header_markdown(state["linkedin_url"])
 
@@ -393,6 +429,11 @@ class SDRAgent:
         }
 
     def _create_pdf(self, state):
+        """
+        This method generates PDF report from the aggregated results.
+        Converts the markdown-formatted sales intelligence report into a PDF
+        and stores it for distribution and archival purposes.
+        """
         data_client = DataClient()
         pdf = ""
         final_pdf = ""
@@ -427,10 +468,16 @@ class SDRAgent:
         return state
 
     def _add_nodes_from_dict(self, builder, nodes: dict):
+        """
+        This method adds multiple nodes to the workflow graph from a dictionary.
+        """
         for label, function in nodes.items():
             builder.add_node(label, function)
 
     def _add_edges_from_combinations(self, builder, start_keys, end_keys):
+        """
+        This method adds edges between multiple start and end nodes.
+        """
         for start in start_keys:
             for end in end_keys:
                 builder.add_edge(start, end)

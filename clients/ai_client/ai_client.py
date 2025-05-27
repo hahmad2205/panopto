@@ -360,7 +360,7 @@ class AIClient:
                 context = citation_context_function()
                 output = self._add_citations_chain(output, context)
             show_status_message(f"✅ {label}...", 'success')
-            return output
+            return f"{output}\n\n"
         except Exception as e:
             show_status_message(f"❌ {label}...", 'error')
             return ""
