@@ -351,17 +351,18 @@ class AIClient:
         )
         return profile_info_markdown
 
-    def process_with_spinner(self, label, chain_function, citation_context_function=None):
+    def process_with_spinner(self, label, chain_function, citation_context_function=None, progress_callback=None, show_spinner_message=None,
+                show_status_message=None):
         try:
+            show_spinner_message(f"{label}...")
             output = chain_function()
             if citation_context_function:
                 context = citation_context_function()
                 output = self._add_citations_chain(output, context)
-            st.markdown(f'<span style="color:black;">✅ {label}...</span>',
-                        unsafe_allow_html=True)
+            show_status_message(f"✅ {label}...", 'success')
             return output
         except Exception as e:
-            print(e)
+            show_status_message(f"❌ {label}...", 'error')
             return ""
 
     def get_context_from_sources(self, sources):
@@ -402,7 +403,7 @@ class AIClient:
 
         return result
 
-    def create_additional_outreach_email(self, llm_output):
+    def create_additional_outreach_email(self, llm_output, progress_callback, show_spinner_message, show_status_message):
         outreach_email_input = {
             "opportunities": llm_output.get("opportunities"),
             "talking_point": llm_output.get("talking_points"),
@@ -421,5 +422,8 @@ class AIClient:
         return self.process_with_spinner(
             "Crafting personalized outreach email",
             lambda: self._outreach_email_chain(outreach_email_input),
-            None
+            None,
+            progress_callback,
+            show_spinner_message,
+            show_status_message
         ) + "\n\n"

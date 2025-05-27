@@ -50,17 +50,36 @@ class State(TypedDict):
     final_pdf: str
     storage_path: str
 
-class SDRAgent:
-    def _fetch_linkedin_profile(self, state: State):
-        profile = {}
 
+class SDRAgent:
+    def __init__(self, progress_callback=None):
+        self.progress_callback = progress_callback
+
+    def show_spinner_message(self, message):
+        """Show spinner message - uses callback if available, otherwise Streamlit directly"""
+        if self.progress_callback:
+            self.progress_callback('spinner', message)
+        else:
+            return st.spinner(message)
+
+    def show_status_message(self, message, status='success'):
+        """Show status message - uses callback if available, otherwise Streamlit directly"""
+        if self.progress_callback:
+            self.progress_callback('status', {'message': message, 'status': status})
+        else:
+            color = "black" if status == 'success' else "red"
+            st.markdown(f'<span style="color:{color};">{message}</span>', unsafe_allow_html=True)
+
+    # All the SDRAgent methods with modified UI calls
+    def _fetch_linkedin_profile(self, state):
+        profile = {}
         try:
-            with st.spinner("Fetching LinkedIn profile..."):
-                linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
-                profile = linkedin_profile_client.store_linkedin_profile()
-                st.markdown('<span style="color:black;">✅ LinkedIn profile fetched...</span>', unsafe_allow_html=True)
+            self.show_spinner_message("Fetching linkedIn profile...")
+            linkedin_profile_client = LinkedinProfileClient(state["linkedin_url"])
+            profile = linkedin_profile_client.store_linkedin_profile()
+            self.show_status_message("✅ LinkedIn profile fetched...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ LinkedIn profile fetching failed...</span>', unsafe_allow_html=True)
+            self.show_status_message("❌ LinkedIn profile fetching failed...", 'error')
 
         user_recent_company_linkedin_profile_urls = linkedin_profile_client.get_recent_experience()
 
@@ -69,34 +88,34 @@ class SDRAgent:
             "user_recent_company_linkedin_profile_urls": user_recent_company_linkedin_profile_urls
         }
 
-    def _fetch_linkedin_company_profile(self, state: State):
+    def _fetch_linkedin_company_profile(self, state):
         linkedin_profile = state["linkedin_profile"]
         linkedin_company_profiles = []
         company_websites = []
 
         try:
-            with st.spinner("Fetching linkedin company profile..."):
-                linkedin_company_profile_client = LinkedinCompanyProfileClient(
-                    state["user_recent_company_linkedin_profile_urls"], linkedin_profile.get("id")
-                )
-                if state["user_recent_company_linkedin_profile_urls"]:
-                    linkedin_company_profiles = linkedin_company_profile_client.store_company_linkedin_profiles()
-            st.markdown('<span style="color:black;">✅ Linkedin company profile fetched...</span>', unsafe_allow_html=True)
+            self.show_spinner_message("Fetching linkedin company profile...")
+            linkedin_company_profile_client = LinkedinCompanyProfileClient(
+                state["user_recent_company_linkedin_profile_urls"], linkedin_profile.get("id")
+            )
+            if state["user_recent_company_linkedin_profile_urls"]:
+                linkedin_company_profiles = linkedin_company_profile_client.store_company_linkedin_profiles()
+            self.show_status_message("✅ Linkedin company profile fetched...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Linkedin company profile fetching failed...</span>', unsafe_allow_html=True)
+            self.show_status_message("❌ Linkedin company profile fetching failed...", 'error')
 
         company_websites_url = linkedin_company_profile_client.get_company_websites()
 
         try:
-            if company_websites:
-                with st.spinner("Fetching company websites..."):
-                    for company_website_url in company_websites_url:
-                        website_crawler = WebsiteCrawlActor(company_website_url)
-                        company_websites = website_crawler.store_company_website()
-                st.markdown('<span style="color:black;">✅ Company websites fetched...</span>', unsafe_allow_html=True)
+            if company_websites_url:
+                self.show_spinner_message("Fetching company websites...")
+
+                for company_website_url in company_websites_url:
+                    website_crawler = WebsiteCrawlActor(company_website_url)
+                    company_websites = website_crawler.store_company_website()
+                self.show_status_message("✅ Company websites fetched...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Company websites fetching failed...</span>',
-                        unsafe_allow_html=True)
+            self.show_status_message("❌ Company websites fetching failed...", 'error')
 
         return {
             "linkedin_company_profiles": linkedin_company_profiles,
@@ -104,107 +123,95 @@ class SDRAgent:
             "company_websites": company_websites
         }
 
-    def _fetch_google_news(self, state: State):
+    def _fetch_google_news(self, state):
         linkedin_profile = state["linkedin_profile"]
         google_news = []
         try:
-            with st.spinner("Fetching google news..."):
-                google_news_client = GoogleNewsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
-                google_news = google_news_client.store_persons_news()
-            st.markdown('<span style="color:black;">✅ Google news fetched...</span>', unsafe_allow_html=True)
+            self.show_spinner_message("Fetching google news...")
+            google_news_client = GoogleNewsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
+            google_news = google_news_client.store_persons_news()
+            self.show_status_message("✅ Google news fetched...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Google news fetching failed...</span>',
-                        unsafe_allow_html=True)
+            self.show_status_message("❌ Google news fetching failed...", 'error')
 
-        return {
-            "google_news": google_news
-        }
+        return {"google_news": google_news}
 
-    def _fetch_google_publications(self, state: State):
+    def _fetch_google_publications(self, state):
         linkedin_profile = state["linkedin_profile"]
         google_publications = []
         try:
-            with st.spinner("Fetching google publications..."):
-                google_scholar_client = GoogleScholarsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
-                google_scholar_author_id = google_scholar_client.store_scholar_profile()
-                if google_scholar_author_id:
-                    google_publications = google_scholar_client.store_scholar_articles(google_scholar_author_id)
-            st.markdown('<span style="color:black;">✅ Google publications fetched...</span>', unsafe_allow_html=True)
+            self.show_spinner_message("Fetching google publications...")
+            google_scholar_client = GoogleScholarsClient(linkedin_profile.get("full_name"), linkedin_profile.get("id"))
+            google_scholar_author_id = google_scholar_client.store_scholar_profile()
+            if google_scholar_author_id:
+                google_publications = google_scholar_client.store_scholar_articles(google_scholar_author_id)
+            self.show_status_message("✅ Google publications fetched...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Google publications fetching failed...</span>',
-                        unsafe_allow_html=True)
+            self.show_status_message("❌ Google publications fetching failed...", 'error')
 
-        return {
-            "google_publications": google_publications
-        }
+        return {"google_publications": google_publications}
 
-    def _fetch_linkedin_posts(self, state: State):
+    def _fetch_linkedin_posts(self, state):
         linkedin_profile = state["linkedin_profile"]
         linkedin_posts = []
         if linkedin_profile:
             try:
-                with st.spinner("Fetching linkedin posts..."):
-                    linkedin_post_actor = LinkedinPostActor(state["linkedin_url"], linkedin_profile.get("id"))
-                    linkedin_posts = linkedin_post_actor.store_linkedin_posts()
-                st.markdown('<span style="color:black;">✅ Linkedin posts fetched...</span>', unsafe_allow_html=True)
+                self.show_spinner_message("Fetching linkedin posts...")
+                linkedin_post_actor = LinkedinPostActor(state["linkedin_url"], linkedin_profile.get("id"))
+                linkedin_posts = linkedin_post_actor.store_linkedin_posts()
+                self.show_status_message("✅ Linkedin posts fetched...", 'success')
             except Exception as e:
-                st.markdown('<span style="color:black;">❌ Linkedin posts fetching failed...</span>',
-                            unsafe_allow_html=True)
+                self.show_status_message("❌ Linkedin posts fetching failed...", 'error')
 
-        return {
-            "linkedin_posts": linkedin_posts
-        }
+        return {"linkedin_posts": linkedin_posts}
 
-    def _fetch_linkedin_comments(self, state: State):
+    def _fetch_linkedin_comments(self, state):
         linkedin_profile = state["linkedin_profile"]
         linkedin_comments = []
 
         if linkedin_profile:
             try:
-                with st.spinner("Fetching linkedin comments..."):
-                    linkedin_comments_actor = LinkedinCommentsActor(state["linkedin_url"], linkedin_profile.get("id"))
-                    linkedin_comments = linkedin_comments_actor.store_linkedin_comments()
-                st.markdown('<span style="color:black;">✅ Linkedin comments fetched...</span>', unsafe_allow_html=True)
+                self.show_spinner_message("Fetching linkedin comments...")
+                linkedin_comments_actor = LinkedinCommentsActor(state["linkedin_url"], linkedin_profile.get("id"))
+                linkedin_comments = linkedin_comments_actor.store_linkedin_comments()
+                self.show_status_message("✅ Linkedin comments fetched...", 'success')
             except Exception as e:
-                st.markdown('<span style="color:black;">❌ Linkedin comments fetching failed...</span>',
-                            unsafe_allow_html=True)
+                self.show_status_message("❌ Linkedin comments fetching failed...", 'error')
 
-        return {
-            "linkedin_comments": linkedin_comments
-        }
+        return {"linkedin_comments": linkedin_comments}
 
-    def _initialize_ai_client(self, state: State):
+    def _initialize_ai_client(self, state):
         linkedin_profile = state["linkedin_profile"]
+        return {"ai_client": AIClient(linkedin_profile.get("id"))}
 
-        return {
-            "ai_client": AIClient(linkedin_profile.get("id"))
-        }
-
-    def _process_google_news(self, state: State):
+    def _process_google_news(self, state):
         ai_client = state["ai_client"]
-
         return {
             "user_google_news": ai_client.process_with_spinner(
                 "Analyzing google news",
                 ai_client.process_google_news_content,
-                ai_client.get_google_news_context
+                ai_client.get_google_news_context,
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_google_publications(self, state: State):
+    def _process_google_publications(self, state):
         ai_client = state["ai_client"]
-
         return {
             "user_publications": ai_client.process_with_spinner(
                 "Analyzing google publications",
                 ai_client.publications_chain,
-                lambda: ai_client.get_context_from_sources([ai_client.publications])
+                lambda: ai_client.get_context_from_sources([ai_client.publications]),
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_opportunities(self, state: State):
+    def _process_opportunities(self, state):
         ai_client = state["ai_client"]
-
         return {
             "opportunities": ai_client.process_with_spinner(
                 "Generating opportunities",
@@ -212,39 +219,44 @@ class SDRAgent:
                 lambda: {
                     **ai_client.get_profile_context(),
                     **ai_client.get_company_context()
-                }
+                },
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_talking_points(self, state: State):
+    def _process_talking_points(self, state):
         ai_client = state["ai_client"]
-
         return {
             "talking_points": ai_client.process_with_spinner(
                 "Identifying talking points",
                 lambda: ai_client.talking_point_chain(state["user_publications"], state["user_google_news"]),
                 lambda: ai_client.get_context_from_sources(
-                    [ai_client.linkedin_profile, ai_client.posts, ai_client.comments, ai_client.google_news, ai_client.publications]
-                )
+                    [ai_client.linkedin_profile, ai_client.posts, ai_client.comments, ai_client.google_news,
+                     ai_client.publications]
+                ),
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_engagement_style(self, state: State):
+    def _process_engagement_style(self, state):
         ai_client = state["ai_client"]
-
         return {
             "engagement_style": ai_client.process_with_spinner(
                 "Determining engagement style",
                 ai_client.engagement_style_chain,
-                lambda: ai_client.get_context_from_sources(
-                    [ai_client.posts, ai_client.comments]
-                )
+                lambda: ai_client.get_context_from_sources([ai_client.posts, ai_client.comments]),
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_objection_handling(self, state: State):
+    def _process_objection_handling(self, state):
         ai_client = state["ai_client"]
-
         return {
             "objection_handling": ai_client.process_with_spinner(
                 "Preparing objection handling strategies",
@@ -252,13 +264,15 @@ class SDRAgent:
                 lambda: {
                     **ai_client.get_profile_context(),
                     **ai_client.get_company_context()
-                }
+                },
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_trigger_events_and_timing(self, state: State):
+    def _process_trigger_events_and_timing(self, state):
         ai_client = state["ai_client"]
-
         return {
             "trigger_events_and_timing": ai_client.process_with_spinner(
                 "Identifying trigger events and timing",
@@ -266,35 +280,41 @@ class SDRAgent:
                 lambda: {
                     **ai_client.get_company_context(),
                     **ai_client.get_context_from_sources([ai_client.posts])
-                }
+                },
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_engagement_highlights(self, state: State):
+    def _process_engagement_highlights(self, state):
         ai_client = state["ai_client"]
-
         return {
             "engagement_highlights": ai_client.process_with_spinner(
                 "Analyzing engagement highlights",
                 ai_client.engagement_highlights_chain,
-                lambda: ai_client.get_context_from_sources([ai_client.posts])
+                lambda: ai_client.get_context_from_sources([ai_client.posts]),
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_company_information(self, state: State):
+    def _process_company_information(self, state):
         ai_client = state["ai_client"]
-
         return {
             "company_information": ai_client.process_with_spinner(
                 "Analyzing company information",
                 ai_client.company_about_chain,
-                ai_client.get_company_context
+                ai_client.get_company_context,
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_linkedin_data(self, state: State):
+    def _process_linkedin_data(self, state):
         ai_client = state["ai_client"]
-
         return {
             "linkedin_data": ai_client.process_with_spinner(
                 "Analyzing LinkedIn data",
@@ -302,11 +322,14 @@ class SDRAgent:
                 lambda: {
                     **ai_client.get_profile_context(),
                     **{f"[{ai_client.citation_list.index(company) + 1}]": company for company in ai_client.companies}
-                }
+                },
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_outreach_email(self, state: State):
+    def _process_outreach_email(self, state):
         ai_client = state["ai_client"]
         llm_output = {
             "opportunities": state["opportunities"],
@@ -318,51 +341,49 @@ class SDRAgent:
             "about_company": state["company_information"],
             "linkedin_data": state["linkedin_data"],
         }
+        return {"outreach_email": ai_client.create_additional_outreach_email(
+            llm_output,
+            self.progress_callback,
+            self.show_spinner_message,
+            self.show_status_message
+        )}
 
-        return {
-            "outreach_email": ai_client.create_additional_outreach_email(llm_output)
-        }
-
-    def _process_additional_outreaches(self, state: State):
+    def _process_additional_outreaches(self, state):
         ai_client = state["ai_client"]
-
         return {
             "additional_outreaches": ai_client.process_with_spinner(
                 "Adding additional outreaches",
                 ai_client.suggested_additional_outreach_chain,
-                ai_client.get_profile_context
+                ai_client.get_profile_context,
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _process_citations(self, state: State):
+    def _process_citations(self, state):
         ai_client = state["ai_client"]
-
         return {
             "citations": ai_client.process_with_spinner(
                 "Adding citations",
                 lambda: ai_client.create_citations(state["linkedin_url"]),
-                None
+                None,
+                self.progress_callback,
+                self.show_spinner_message,
+                self.show_status_message
             ) + "\n\n"
         }
 
-    def _aggregate_ai_result(self, state: State):
+    def _aggregate_ai_result(self, state):
         ai_client = state["ai_client"]
         profile_info_markdown = ai_client.create_profile_header_markdown(state["linkedin_url"])
 
         ai_results = [
-            state["opportunities"],
-            state["talking_points"],
-            state["engagement_style"],
-            state["objection_handling"],
-            state["trigger_events_and_timing"],
-            state["engagement_highlights"],
-            state["company_information"],
-            state["linkedin_data"],
-            state["user_publications"],
-            state["user_google_news"],
-            state["outreach_email"],
-            state["additional_outreaches"],
-            state["citations"],
+            state["opportunities"], state["talking_points"], state["engagement_style"],
+            state["objection_handling"], state["trigger_events_and_timing"],
+            state["engagement_highlights"], state["company_information"],
+            state["linkedin_data"], state["user_publications"], state["user_google_news"],
+            state["outreach_email"], state["additional_outreaches"], state["citations"],
         ]
         results_combined = "".join(result for result in ai_results)
 
@@ -371,45 +392,37 @@ class SDRAgent:
             "result": "## Sales Insights\n" + results_combined
         }
 
-    def _create_pdf(self, state: State):
+    def _create_pdf(self, state):
         data_client = DataClient()
         pdf = ""
         final_pdf = ""
         storage_path = ""
         try:
-            with st.spinner("Creating PDF..."):
-                pdf = markdown_to_pdf(state["profile_info_markdown"], state["result"])
-                final_pdf, storage_path = data_client.store_processed_profile(pdf, state["result"], state["email"], state["linkedin_profile"])
-
-                st.markdown('<span style="color:black;">✅ PDF created...</span>',
-                            unsafe_allow_html=True)
+            self.show_spinner_message("Creating PDF...")
+            pdf = markdown_to_pdf(state["profile_info_markdown"], state["result"])
+            final_pdf, storage_path = data_client.store_processed_profile(pdf, state["result"], state["email"],
+                                                                          state["linkedin_profile"])
+            self.show_status_message("✅ PDF created...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ PDF creation failed...</span>',
-                        unsafe_allow_html=True)
+            self.show_status_message("❌ PDF creation failed...", 'error')
 
-        return {
-            "pdf": pdf,
-            "final_pdf": final_pdf,
-            "storage_path": storage_path
-        }
+        return {"pdf": pdf, "final_pdf": final_pdf, "storage_path": storage_path}
 
-    def _send_email(self, state: State):
+    def _send_email(self, state):
         try:
-            with st.spinner("Sending email..."):
-                email_client = EmailClient()
-                email_kwargs = {
-                    "linkedin_profile": state["linkedin_profile"],
-                    "final_pdf": state["final_pdf"],
-                    "email_to": state["email"],
-                    "storage_path": state["storage_path"],
-                    "pdf": state["pdf"],
-                }
-                email_client.send_email(**email_kwargs)
-
-                st.markdown('<span style="color:black;">✅ Email sent...</span>', unsafe_allow_html=True)
+            self.show_spinner_message("Sending email...")
+            email_client = EmailClient()
+            email_kwargs = {
+                "linkedin_profile": state["linkedin_profile"],
+                "final_pdf": state["final_pdf"],
+                "email_to": state["email"],
+                "storage_path": state["storage_path"],
+                "pdf": state["pdf"],
+            }
+            email_client.send_email(**email_kwargs)
+            self.show_status_message("✅ Email sent...", 'success')
         except Exception as e:
-            st.markdown('<span style="color:black;">❌ Sending email failed...</span>',
-                        unsafe_allow_html=True)
+            self.show_status_message("❌ Sending email failed...", 'error')
 
         return state
 
@@ -526,12 +539,8 @@ class SDRAgent:
     def invoke_graph(self, linkedin_url: str, email: str):
         try:
             graph = self.create_graph()
-            initial_state = {
-                "linkedin_url": linkedin_url,
-                "email": email,
-            }
+            initial_state = {"linkedin_url": linkedin_url, "email": email}
             graph.invoke(initial_state)
-
             return [200, f"Email sent to {email}"]
         except Exception as e:
             return [None, f"Processing failed: {str(e)}"]

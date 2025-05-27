@@ -1,5 +1,8 @@
 import os
 import re
+import threading
+import time
+from queue import Empty, Queue
 
 import sentry_sdk
 import streamlit as st
@@ -20,6 +23,63 @@ if SENTRY_DSN:
         environment=os.environ.get("ENVIRONMENT", "development"),
     )
 
+
+def execute_graph_async(linkedin_url, email, progress_queue):
+    """Execute the graph in a separate thread"""
+
+    def progress_callback(msg_type, data):
+        progress_queue.put({'type': msg_type, 'data': data})
+
+    try:
+        # Create the modified SDRAgent with progress callback
+        graph_agent = SDRAgent(progress_callback)
+
+        # Execute the graph
+        success, message = graph_agent.invoke_graph(linkedin_url, email)
+
+        # Send final result
+        progress_queue.put({
+            'type': 'complete',
+            'success': success,
+            'message': message
+        })
+
+    except Exception as e:
+        progress_queue.put({
+            'type': 'complete',
+            'success': False,
+            'message': f"An error occurred: {str(e)}"
+        })
+
+
+def check_progress():
+    """Check for progress updates and handle completion"""
+    try:
+        while True:
+            update = st.session_state.progress_queue.get_nowait()
+
+            if update['type'] == 'spinner':
+                st.session_state.current_step = update['data']
+
+            elif update['type'] == 'status':
+                status_data = update['data']
+                st.session_state.progress_messages.append(status_data)
+
+            elif update['type'] == 'complete':
+                # Handle completion
+                st.session_state.api_call_status = update['success']
+                st.session_state.api_message = update['message']
+                st.session_state.search_complete = True
+                st.session_state.run_search = False
+                st.session_state.execution_thread = None
+                st.session_state.current_step = ""
+                break
+
+    except Empty:
+        # No updates available
+        pass
+
+
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
@@ -32,6 +92,14 @@ if "api_call_status" not in st.session_state:
     st.session_state.api_call_status = None
 if "api_message" not in st.session_state:
     st.session_state.api_message = ""
+if 'progress_queue' not in st.session_state:
+    st.session_state.progress_queue = Queue()
+if 'execution_thread' not in st.session_state:
+    st.session_state.execution_thread = None
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = ""
+if 'progress_messages' not in st.session_state:
+    st.session_state.progress_messages = []
 
 
 # --- Callback for starting search ---
@@ -61,6 +129,8 @@ def reset():
     st.session_state.api_message = ""
     st.session_state.linkedin_url = ""
     st.session_state.email = ""
+    st.session_state.progress_messages = []
+    st.session_state.progress_queue = Queue()
 
 
 # --- Page Config ---
@@ -352,7 +422,7 @@ if st.session_state.authenticated:
             """
             <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
                 <div style="background-color: #C0C0C0; padding: 10px 20px; margin-top: 20px; border-radius: 5px; width: 60%; text-align: center;">
-                    ⓘ️  The prospects report generation will take ~5 minutes. Do not refresh or close the page.
+                    ⓘ️  The prospects report generation will take ~2 minutes. Do not refresh or close the page.
                 </div>
             </div>
             """,
@@ -425,21 +495,74 @@ if st.session_state.authenticated:
                         unsafe_allow_html=True,
                     )
 
-            # Once "run_search" is True, execute the main logic
+            # Once "run_search" is True, start the async execution
             if st.session_state.run_search and not st.session_state.search_complete:
-                graph = SDRAgent()
+                # Start the execution thread if not already running
+                if st.session_state.execution_thread is None:
+                    st.session_state.execution_thread = threading.Thread(
+                        target=execute_graph_async,
+                        args=(st.session_state.linkedin_url, st.session_state.email, st.session_state.progress_queue)
+                    )
+                    st.session_state.execution_thread.start()
 
-                success, message = graph.invoke_graph(
-                    st.session_state.linkedin_url, st.session_state.email
-                )
-                st.session_state.api_call_status = success
-                st.session_state.api_message = message
-                st.session_state.search_complete = True
-                st.session_state.run_search = False
+                # Show progress container
+                progress_container = st.container()
+                with progress_container:
+                    # Check for progress updates
+                    check_progress()
+
+                    # Show current step if available
+                    if st.session_state.current_step:
+                        st.markdown(f"""
+                            <div style="
+                                background-color: #C0C0C0;
+                                border-left: 5px solid black;
+                                padding: 10px 15px;
+                                border-radius: 8px;
+                                margin-bottom: 20px;
+                                font-size: 16px;
+                                color: #1a1a1a;
+                                display: flex;
+                                align-items: center;
+                            ">
+                                <div style="
+                                    border: 4px solid #f3f3f3;
+                                    border-top: 4px solid black;
+                                    border-radius: 50%;
+                                    width: 18px;
+                                    height: 18px;
+                                    animation: spin 1s linear infinite;
+                                    margin-right: 10px;
+                                "></div>
+                                <strong>Current Step:</strong> {st.session_state.current_step}
+                            </div>
+
+                            <style>
+                            @keyframes spin {{
+                                0% {{ transform: rotate(0deg); }}
+                                100% {{ transform: rotate(360deg); }}
+                            }}
+                            </style>
+                        """, unsafe_allow_html=True)
+
+                    # Show progress messages
+                    if st.session_state.progress_messages:
+                        st.markdown("**Progress:**")
+                        for msg in st.session_state.progress_messages:  # Show last 5 messages
+                            status_color = "green" if msg['status'] == 'success' else "red"
+                            st.markdown(
+                                f'<span style="color:{status_color};">{msg["message"]}</span>',
+                                unsafe_allow_html=True
+                            )
+
+                    # If still running, rerun after a short delay
+                    if st.session_state.run_search:
+                        time.sleep(1)
+                        st.rerun()
 
             # Display results and "Start Over"
             if st.session_state.search_complete:
-                if st.session_state.api_call_status:
+                if st.session_state.api_call_status is not None:
                     status_class = "status-success" if st.session_state.api_call_status else "status-error"
                     st.markdown(
                         f'<div class="status-message {status_class}">{st.session_state.api_message}</div>',
@@ -516,7 +639,6 @@ if st.session_state.authenticated:
                         ),
                         unsafe_allow_html=True
                     )
-
 
 elif not st.session_state.authenticated:
     st.markdown(
