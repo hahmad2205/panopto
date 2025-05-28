@@ -23,6 +23,12 @@ if SENTRY_DSN:
         environment=os.environ.get("ENVIRONMENT", "development"),
     )
 
+chromium_path = os.path.expanduser("~/.cache/ms-playwright/chromium-1169")
+if not os.path.exists(chromium_path):
+    with st.spinner("Installing Playwright browsers..."):
+        subprocess.run(["playwright", "install", "--with-deps", "chromium"], check=True)
+        st.success("Playwright Chromium installed!")
+
 if not os.path.exists(os.path.expanduser("~/.crawl4ai")):
     with st.spinner("Running crawl4ai setup..."):
         subprocess.run(["crawl4ai-setup"], check=True)
