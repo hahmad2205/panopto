@@ -554,7 +554,6 @@ class SDRAgent:
                 "process_company_information",
                 "process_linkedin_data",
                 "process_additional_outreaches",
-                "process_citations"
             ]
         )
         self._add_edges_from_combinations(
@@ -570,13 +569,13 @@ class SDRAgent:
                 "process_company_information",
                 "process_linkedin_data",
                 "process_additional_outreaches",
-                "process_citations"
             ],
             ["process_talking_points"]
         )
 
         builder.add_edge("process_talking_points", "process_outreach_email")
-        builder.add_edge("process_outreach_email", "aggregate_ai_result")
+        builder.add_edge("process_outreach_email", "process_citations")
+        builder.add_edge("process_citations", "aggregate_ai_result")
         builder.add_edge("aggregate_ai_result", "create_pdf")
         builder.add_edge("create_pdf", "send_email")
         builder.add_edge("send_email", END)

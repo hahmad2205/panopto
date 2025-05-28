@@ -354,12 +354,14 @@ class AIClient:
     def process_with_spinner(self, label, chain_function, citation_context_function=None, progress_callback=None, show_spinner_message=None,
                 show_status_message=None):
         try:
+            print(f"{label} started")
             show_spinner_message(f"{label}...")
             output = chain_function()
             if citation_context_function:
                 context = citation_context_function()
                 output = self._add_citations_chain(output, context)
             show_status_message(f"✅ {label}...", 'success')
+            print(f"{label} ended")
             return f"{output}\n\n"
         except Exception as e:
             show_status_message(f"❌ {label}...", 'error')
