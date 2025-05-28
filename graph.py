@@ -493,7 +493,7 @@ class SDRAgent:
             "fetch_google_news": self._fetch_google_news,
             "fetch_google_publications": self._fetch_google_publications,
             "initialize_ai_client": self._initialize_ai_client,
-            "process_google_news": self._process_google_news,
+            # "process_google_news": self._process_google_news,
             "process_google_publications": self._process_google_publications,
             "process_opportunities": self._process_opportunities,
             "process_talking_points": self._process_talking_points,
@@ -544,7 +544,7 @@ class SDRAgent:
             builder,
             ["initialize_ai_client"],
             [
-                "process_google_news",
+                # "process_google_news",
                 "process_google_publications",
                 "process_opportunities",
                 "process_engagement_style",
@@ -559,7 +559,7 @@ class SDRAgent:
         self._add_edges_from_combinations(
             builder,
             [
-                "process_google_news",
+                # "process_google_news",
                 "process_google_publications",
                 "process_opportunities",
                 "process_engagement_style",
