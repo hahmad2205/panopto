@@ -3,8 +3,6 @@ xfonts-75dpi
 xfonts-base
 build-essential
 libpq-dev
-
-# Required by Playwright/Chromium
 libnss3
 libatk-bridge2.0-0
 libxcomposite1
