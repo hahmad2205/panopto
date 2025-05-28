@@ -24,4 +24,5 @@ xhtml2pdf
 gnews==0.4.*
 sentry-sdk==1.35.0
 langgraph==0.4.*
-Crawl4AI==0.6.*
+crawl4ai
+playwright
