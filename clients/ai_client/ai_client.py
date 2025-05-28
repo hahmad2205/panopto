@@ -1,11 +1,10 @@
 import dotenv
-import streamlit as st
 from decouple import config
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_openai import ChatOpenAI
 from langsmith import Client as LangSmithClient
 
-from clients.apify.website_crawl_actor import WebsiteCrawlActor
+from clients.web_scrapper_client.web_scrapper_client import WebsiteCrawler
 from pydantic_models import ScholarProfile, GoogleNews, AvailableNews
 from streamlit_styles import processing_spinner_style
 from supabase_client import supabase_client
@@ -280,7 +279,7 @@ class AIClient:
             google_news_content.news, list) else []
 
         for news in top_news:
-            article_crawler = WebsiteCrawlActor({"website_url": news.link})
+            article_crawler = WebsiteCrawler({"website_url": news.link})
             google_news_with_article_content.append({
                 "title": news.title,
                 "content": article_crawler.crawl_page()

@@ -3,3 +3,4 @@ xfonts-75dpi
 xfonts-base
 build-essential
 libpq-dev
+crawl4ai-setup

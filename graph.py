@@ -4,13 +4,13 @@ from langgraph.graph import StateGraph, START, END
 from clients.ai_client.ai_client import AIClient
 from clients.apify.linkedin_comments_actor import LinkedinCommentsActor
 from clients.apify.linkedin_post_actor import LinkedinPostActor
-from clients.apify.website_crawl_actor import WebsiteCrawlActor
 from clients.data_client.data_client import DataClient
 from clients.email_client.email_client import EmailClient
 from clients.proxy_curl.linkedin_company_profile import LinkedinCompanyProfileClient
 from clients.proxy_curl.linkedin_profile import LinkedinProfileClient
 from clients.serp.google_news import GoogleNewsClient
 from clients.serp.google_scholars import GoogleScholarsClient
+from clients.web_scrapper_client.web_scrapper_client import WebsiteCrawler
 from state import State
 from utils import markdown_to_pdf
 
@@ -93,7 +93,7 @@ class SDRAgent:
                 self.show_spinner_message("Fetching company websites...")
 
                 for company_website_url in company_websites_url:
-                    website_crawler = WebsiteCrawlActor(company_website_url)
+                    website_crawler = WebsiteCrawler(company_website_url)
                     company_websites.append(website_crawler.store_company_website())
                 self.show_status_message("✅ Company websites fetched...", 'success')
         except Exception as e:
@@ -493,7 +493,7 @@ class SDRAgent:
             "fetch_google_news": self._fetch_google_news,
             "fetch_google_publications": self._fetch_google_publications,
             "initialize_ai_client": self._initialize_ai_client,
-            # "process_google_news": self._process_google_news,
+            "process_google_news": self._process_google_news,
             "process_google_publications": self._process_google_publications,
             "process_opportunities": self._process_opportunities,
             "process_talking_points": self._process_talking_points,
@@ -544,7 +544,7 @@ class SDRAgent:
             builder,
             ["initialize_ai_client"],
             [
-                # "process_google_news",
+                "process_google_news",
                 "process_google_publications",
                 "process_opportunities",
                 "process_engagement_style",
@@ -559,7 +559,7 @@ class SDRAgent:
         self._add_edges_from_combinations(
             builder,
             [
-                # "process_google_news",
+                "process_google_news",
                 "process_google_publications",
                 "process_opportunities",
                 "process_engagement_style",
