@@ -363,7 +363,7 @@ class AIClient:
             print(f"{label} ended")
             return f"{output}\n\n"
         except Exception as e:
-            show_status_message(f"❌ {label}...", 'error')
+            show_status_message(f"❌ {label}...{e}", 'error')
             return ""
 
     def get_context_from_sources(self, sources):
