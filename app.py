@@ -1,8 +1,11 @@
 import os
+import os
 import re
 import sentry_sdk
 import streamlit as st
 import subprocess
+import subprocess
+import sys
 import threading
 import time
 from decouple import config
@@ -11,6 +14,17 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 
 from graph import SDRAgent
 
+@st.cache_resource
+def install_playwright():
+    try:
+        # Install playwright browsers
+        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+        subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=True)
+        print("Playwright browsers installed successfully")
+    except subprocess.CalledProcessError as e:
+        print(f"Error installing playwright: {e}")
+
+install_playwright()
 SENTRY_DSN = config('SENTRY_DSN')
 
 if SENTRY_DSN:

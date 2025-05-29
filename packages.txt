@@ -39,3 +39,5 @@ libdrm2
 libatspi2.0-0
 libxfixes3
 libcairo2
+chromium-browser
+chromium-chromedriver
